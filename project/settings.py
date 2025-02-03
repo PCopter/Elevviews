@@ -27,7 +27,7 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG") == 'True'
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 production_host = os.getenv("PRODUCTION_HOST")
 ALLOWED_HOSTS = [production_host] if production_host is not None else ["127.0.0.1"]
@@ -85,13 +85,24 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'mysql.connector.django',
+    #     'NAME': os.getenv("DB_NAME"),
+    #     'USER' : os.getenv("DB_USER"),
+    #     'PASSWORD' : os.getenv("DB_PASSWORD"),
+    #     'HOST' : os.getenv("DB_HOST"),
+    #     'PORT' : os.getenv("DB_PORT")
+    # }
     'default': {
-        'ENGINE': 'mysql.connector.django',
+        'ENGINE': 'django.db.backends.mysql',  # เปลี่ยนจาก 'mysql.connector.django' เป็น 'django.db.backends.mysql'
         'NAME': os.getenv("DB_NAME"),
-        'USER' : os.getenv("DB_USER"),
-        'PASSWORD' : os.getenv("DB_PASSWORD"),
-        'HOST' : os.getenv("DB_HOST"),
-        'PORT' : os.getenv("DB_PORT")
+        'USER': os.getenv("DB_USER"),
+        'PASSWORD': os.getenv("DB_PASSWORD"),
+        'HOST': os.getenv("DB_HOST"),
+        'PORT': os.getenv("DB_PORT", "3306"),  # ใส่ค่า default เป็น 3306
+        'OPTIONS': {
+            'charset': 'utf8mb4',  # แนะนำให้ใช้ utf8mb4 เพื่อรองรับภาษาไทย
+        },
     }
 }
 
