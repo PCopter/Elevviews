@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+mysql-connector-python = "*"
+pillow = "*"
+boto3 = "*"
+python-dotenv = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
+python_full_version = "3.12.4"
