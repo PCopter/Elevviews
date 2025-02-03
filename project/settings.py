@@ -101,9 +101,9 @@ DATABASES = {
     # }
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mydb',
-        'USER': 'myuser',
-        'PASSWORD': 'mypassword',
+        'NAME': 'Elevviews',
+        'USER': 'Elevviews',
+        'PASSWORD': 'cC.053346532',
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
