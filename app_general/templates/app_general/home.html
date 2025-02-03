@@ -1,0 +1,124 @@
+{% extends 'app_general/components/base.html' %}
+{% load static %}
+
+{% block site_title %}
+  Home |
+{% endblock %}
+
+{% block content %}
+  <!-- <section class="home-landing-section">
+    <h1 class="home-landing-text">Camera man</h1>
+    <h5 class="home-landing-text">Skibidi toilet</h5>
+    <h6 class="home-landing-text">ถ่ายสวยด้วยมือเราไม่ต้องง้อใคร</h6>
+    <p>
+      <a class="button">ดูรูปภาพ</a>
+      <a class="button button-primary" href="{% url 'cameras' %}">ดูกล้องทั้งหมด</a>
+    </p>
+
+  </section>
+  <div>
+    <h1 style="text-align: center; margin: 10px;">Welcome</h1>
+  </div> -->
+
+  <section class="main">
+    <h1>"ElevView Elevate Your Vision" - ยกระดับมุมมองของคุณ</h1>
+    
+
+
+    <!-- Animation Container -->
+    <div class="lottie">
+      <div  id="lottie-animation" style="width: 300 ; height: 300;"></div>
+      
+    <!-- Load Animation Script -->
+    <script>
+      lottie.loadAnimation({
+          container: document.getElementById('lottie-animation'), // Element ที่จะแสดงแอนิเมชัน
+          renderer: 'svg', // ใช้ svg renderer
+          loop: true, // เล่นแอนิเมชันวนซ้ำ
+          autoplay: true, // เล่นแอนิเมชันอัตโนมัติ
+          path: "{% static 'json/Animation1.json' %}" // ดึงไฟล์ JSON จาก static folder
+      });
+    </script>
+    </div>
+
+
+    <!-- <p>Collect all the data you need to <strong>understand customers</strong> with forms designed to be refreshingly different.</p> -->
+
+    <p>ElevView จะยกระดับมุมมองของคุณให้เห็นภาพที่สวยในมุมที่ดีทึ่สุดที่คุณไม่เคยได้สัมผัสด้วยระบบการสั่งใช้งานกล้องIot จาก Web application ทำให้คุณสามารถถ่ายรูปเองได้แม้ว่าจะมาท่องเที่ยวเพียงลำพัง</p>
+    <div class="cta">
+        <button>
+          <a style="color: white; text-decoration: none;" href="{% url 'cameras' %}">Get started—it’s free</a>
+        </button>
+    </div>
+
+    
+  </section>
+
+
+<style>
+  /* .home-landing-section {
+    background-color: #e9e9e9;
+    background-image: url('Angkaew.JPG');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    text-align: center;
+    padding: 120px 16px;
+
+}
+
+.home-landing-text{
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+    margin-top: 0px;
+    margin-bottom: 24px;
+} */
+        .lottie {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff00;
+            
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #333;
+            text-align: center;
+        }
+        .main {
+            padding: 50px 20px;
+        }
+
+        .main h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .main p {
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .cta {
+            margin-top: 30px;
+        }
+
+        .cta button {
+            background: black;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 5px;
+        }
+
+        .cta button:hover {
+            background: #444;
+        }
+</style>
+
+{% endblock %}

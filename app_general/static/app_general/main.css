@@ -1,0 +1,275 @@
+/* mitr-300 - latin_thai */
+@font-face {
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'Mitr';
+    font-style: normal;
+    font-weight: 300;
+    src: url('fonts/mitr-v11-latin_thai-300.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+  }
+  /* mitr-regular - latin_thai */
+@font-face {
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'Mitr';
+    font-style: normal;
+    font-weight: 400;
+    src: url('fonts/mitr-v11-latin_thai-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+  }
+
+
+/* Global */
+
+*, ::before, ::after {
+    box-sizing: border-box;
+}
+
+html{
+    color: #333333;
+    font-family: 'Mitr', 'sans-serif';
+    font-weight: 300;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    color: #111111;
+    font-weight: 400;
+    line-height: 1.4;
+    margin-top: 0px;
+    margin-bottom: 16px;
+}
+
+h1 {
+    font-size: 32px;
+}
+h2 {
+    font-size: 28px;
+}
+h3 {
+    font-size: 24px;
+}
+h4 {
+    font-size: 22px;
+}
+h5 {
+    font-size: 20px;
+}
+h6 {
+    font-size: 18px;
+}
+p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-top: 0px;
+    margin-bottom: 16px;
+}
+
+a {
+    color: #3476f0;
+}
+
+.button {
+    color: white;
+    background-color: #333333;
+    border: none;
+    border-radius: 8px;
+    font-weight: 400;
+    line-height: 1;
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 16px;
+    text-decoration: none;
+}
+.button-primary {
+    background-color: #3476f0;
+}
+
+.content-section {
+    padding: 32px 16px;
+}
+
+.content-section-single {
+    min-height: calc(100vh-120);
+}
+
+.content-container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.content-title {
+    margin-bottom: 24px;
+}
+
+
+
+
+
+
+/* Form */
+.form-field {
+    margin-bottom: 16px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 4px;
+    line-height: 1.6;
+  }
+  
+  input[type='text'],
+  input[type='email'],
+  input[type='password'],
+  textarea {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    color: #333333;
+    border: 1px solid #888888;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 300;
+    display: block;
+    width: 100%;
+    height: 35px;
+    padding: 6px 12px;
+    outline: none;
+  }
+  
+  input[type='text']:focus,
+  input[type='email']:focus,
+  input[type='password']:focus,
+  textarea:focus {
+    border-color: #0D79F2;
+  }
+  
+  textarea {
+    height: auto;
+  }
+  
+  .button {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    color: white;
+    background-color: #111111;
+    border: none;
+    border-radius: 8px;
+    font-weight: 400;
+    line-height: 1;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+  }
+  
+  .button-primary {
+    background-color: #0D79F2;
+  }
+  
+  .button-primary:hover {
+    background-color: #085dbd;
+  }
+  
+  .content-container-narrow {
+    max-width: 600px;
+  }
+
+/* card view */
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .card {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+  }
+
+  .card-image {
+    position: relative;
+    width: 100%;
+    height: 75%;
+  }
+
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .status-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 5px 6px;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .status.online {
+    background-color: green;
+    border-radius: 5px;
+    padding: 1px 5px;
+  }
+
+  .status.offline {
+    background-color: red;
+    border-radius: 5px;
+    padding: 1px 5px;
+  }
+
+  .card-content {
+    height: 25%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+  }
+
+  .card-text {
+    text-align: left;
+  }
+
+  .name {
+    font-size: 16px;
+    font-weight: 400;
+    margin: 0;
+  }
+
+  .name-thai {
+    font-size: 12px;
+    font-weight: normal;
+    color: gray;
+    margin: 0;
+    
+  }
+
+  .btn-primary {
+    padding: 15px 20px;
+    background-color: #4C436B;
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    justify-content: center;
+  }
+
+  .btn-primary:hover {
+    background-color: #dfb6fa;
+  }
+
+
+  
