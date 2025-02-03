@@ -1,0 +1,41 @@
+{% extends 'app_general/components/base.html' %}
+{% load static %}
+
+{% block site_title %}
+  All Cameras |
+{% endblock %}
+
+{% block content %}
+<section class="content-section content-section-single">
+  <div class="content-container">
+    <h2 class="content-title" style="text-align: center;">Choose your Camera</h2>
+    <div class="row">
+      {% for camera in cameras %}
+        <div class="card">
+          <div class="card-image">
+            <img src="{% static camera.image %}" alt="{{ camera.name }}">
+            <div class="status-badge">
+              {% if camera.status == "Online" %}
+                <span class="status online">Online</span>
+              {% else %}
+                <span class="status offline">Offline</span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="card-text">
+              <h5 class="name">{{ camera.name }}</h5>
+              <h6 class="name-thai">{{ camera.name_thai }}</h6>
+            </div>
+            <a href="{% url 'camera' camera.id %}" class="btn btn-primary">Choose <i style="margin-right: 2px;" class="fa fa-chevron-right" aria-hidden="true"></i> </a>
+          </div>
+        </div>
+      {% empty %}
+        <p>No cameras are available.</p>
+      {% endfor %}
+    </div>
+</section>
+</div>
+{% endblock %}
+
+

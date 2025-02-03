@@ -1,0 +1,56 @@
+{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}
+  Take Photo - {{ camera.name }}
+{% endblock %}
+
+{% block content %}
+  <h1>Take Photo with {{ camera.name }}</h1>
+  <p>IP Address: {{ camera.ip_address }}</p>
+  <p>Status: {{ camera.get_status_display }}</p>
+
+  <div>
+    <button id="take-photo-button">Take Photo</button>
+    
+
+    {% if latest_photo %}
+      <img src="{{ latest_photo.image.url }}" alt="Captured Photo" style="width: 300px; height: auto;" />
+      
+    {% else %}
+      <p>No photo captured yet.</p>
+    {% endif %}
+    <p id="result-message" style="color: green;"></p>
+  </div>
+    
+
+  <script>
+    // Function to send capture image command
+    document.getElementById('take-photo-button').addEventListener('click', async () => {
+      document.getElementById('result-message').textContent = "Sending capture command to the camera...";
+      const response = await fetch(window.location.href, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ action: 'capture_image' })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        document.getElementById('result-message').textContent = result.message;
+        const img = document.getElementById('result-photo');
+        img.src = result.image_url;
+        img.style.display = 'block';
+
+        document.getElementById('photo-actions').style.display = 'block';
+      } else {
+        const error = await response.json();
+        document.getElementById('result-message').textContent = `Error: ${error.error}`;
+      }
+    });
+
+  </script>
+{% endblock %}
+
+

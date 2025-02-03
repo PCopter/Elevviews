@@ -1,0 +1,146 @@
+{% extends 'app_general/components/base.html' %}
+{% load static %}
+
+{% block site_title %}
+  Camera {{ camera.title }} |
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  {% if camera is not None %}
+    <div class="card" style="width: 100%; margin: 1rem auto; text-align: center;">
+      <!-- ชื่อกล้อง -->
+      <h3 class="card-title" style="margin: 1rem 0;">{{ camera.name }}</h3>
+      
+      <!-- รูปภาพ -->
+      <img src="{% static camera.image %}" class="card-img-top" alt="{{ camera.title }}" style="max-width: 100%; height: auto; object-fit: cover; margin: 0 auto;">
+
+      <!-- ปุ่มไอคอนอยู่ด้านล่างของรูปภาพ -->
+      <div class="card-icons" style="margin: 1rem auto;">
+        <a href="{% url 'takephoto' camera.id %}" class="icon-btn" title="Take Photo">
+          <i class="fa fa-camera" aria-hidden="true"></i>
+        </a>
+        <a href="https://www.google.com/maps?q={{ camera.latitude }},{{ camera.longitude }}" 
+           class="icon-btn" 
+           target="_blank" 
+           title="View on Google Maps">
+          <i class="fa fa-map-marker" aria-hidden="true"></i>
+        </a>
+        <button class="icon-btn" title="View Details" onclick="openDetailsPopup()">
+          <i class="fa fa-bars" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <!-- ข้อมูลทั่วไป -->
+      <!-- <div class="card-body">
+        <p class="card-text"><strong>IP Address:</strong> {{ camera.ip_address }}</p>
+        <p class="card-text">
+          <strong>Status:</strong>
+          {% if camera.status == "Online" %}
+            <span style="color: green;">Online</span>
+          {% else %}
+            <span style="color: red;">Offline</span>
+          {% endif %}
+        </p>
+        <p class="card-text"><strong>Latitude:</strong> {{ camera.latitude }}</p>
+        <p class="card-text"><strong>Longitude:</strong> {{ camera.longitude }}</p>
+      </div> -->
+    </div>
+  {% else %}
+    <p>This camera ID was not found.</p>
+  {% endif %}
+</div>
+
+<!-- Popup Page -->
+<div id="details-popup" class="popup-overlay" style="display: none;">
+  <div class="popup-content">
+    <h3>Camera Details</h3>
+    <p><strong>Name:</strong> {{ camera.name }}</p>
+    <p><strong>IP Address:</strong> {{ camera.ip_address }}</p>
+    <p><strong>Status:</strong> 
+      {% if camera.status == "Online" %}
+        <span style="color: green;">Online</span>
+      {% else %}
+        <span style="color: red;">Offline</span>
+      {% endif %}
+    </p>
+    <p><strong>Connection Type:</strong> {{ camera.connection_type }}</p>
+    <p><strong>Added On:</strong> {{ camera.added_on }}</p>
+    <p><strong>Last Updated:</strong> {{ camera.updated_on }}</p>
+    <button onclick="closeDetailsPopup()" class="btn btn-secondary">Close</button>
+  </div>
+</div>
+
+
+<style>
+  .card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .card-img-top {
+    max-width: 90%;
+    height: auto;
+    object-fit: cover;
+    margin: 0 auto;
+    border-radius: 10px;
+  }
+
+  .card-icons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .icon-btn {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    color: #333;
+    transition: all 0.3s;
+  }
+
+  .icon-btn:hover {
+    background: #f0f0f0;
+    transform: scale(1.1);
+  }
+
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    text-align: left;
+  }
+</style>
+
+<script>
+  function openDetailsPopup() {
+    document.getElementById('details-popup').style.display = 'flex';
+  }
+
+  function closeDetailsPopup() {
+    document.getElementById('details-popup').style.display = 'none';
+  }
+</script>
+
+{% endblock %}
