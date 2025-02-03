@@ -1,0 +1,16 @@
+{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}
+Thank you for registering|
+{% endblock %}
+
+{% block content %}
+<section class="content-section content-section-single">
+  <div class="content-container content-container-narrow">
+    <h2 class="content-title">Thank you for registering.</h2>
+    <p>Please check your email and activate your account.</p>
+    <a class="button button-primary" href="{% url 'login' %}">Log in</a>
+
+  </div>
+</section>
+{% endblock %}

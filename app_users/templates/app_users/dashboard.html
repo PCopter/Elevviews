@@ -1,0 +1,107 @@
+{% extends 'app_general/components/base.html' %}
+
+{% block site_title %}
+  Dashboard | {{ user.username }}
+{% endblock %}
+
+{% block content %}
+<section class="content-section content-section-single">
+  <div class="content-container content-container-narrow">
+    <h2 class="content-title">Dashboard of {{ user.username }}</h2>
+
+    <p>
+      <a href="{% url 'dashboard' %}">Dashboard</a>
+      <a href="{% url 'profile' %}">Profile</a>
+      <a href="{% url 'password_change' %}">Change password</a>
+    </p>
+
+    <div class="site-header-item">
+      <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" style="border: none; background: none; color: inherit; cursor: pointer; padding: 0; color: rgb(41, 41, 41);">
+          <span>Log out</span>
+        </button>
+      </form>
+    </div>
+
+    <h3>Your Photos</h3>
+
+
+  {% if user_photos %}
+    <div class="photo-gallery">
+
+      {% for photo in user_photos %}
+      <div class="photo-item">
+        <img src="{{ photo.image.url }}" alt="Photo taken with {{ photo.camera.name }}" />
+        <p>Taken with: {{ photo.camera.name }}</p>
+        <p>Date: {{ photo.timestamp|date:"F j, Y, g:i a" }}</p>
+
+        <!-- ปุ่มสำหรับดาวน์โหลดรูปภาพ -->
+        <a href="{{ photo.image.url }}" download="{{ photo.image.name }}" class="btn btn-download">Download</a>
+
+        <!-- ปุ่มสำหรับลบรูปภาพ -->
+        <form method="POST" action="{% url 'delete_photo' photo.id %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-delete">Delete</button>
+        </form>
+      </div>
+    {% endfor %}
+
+  </div>
+
+{% else %}
+  <p>No photos uploaded yet.</p>
+{% endif %}
+</div>
+
+
+</section>
+
+<style>
+  .photo-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  .photo-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    background-color: #f9f9f9;
+  }
+  .photo-item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin-top: 10px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #fff;
+  }
+
+  .btn-download {
+    background-color: #28a745;
+  }
+
+  .btn-download:hover {
+    background-color: #218838;
+  }
+
+  .btn-delete {
+    background-color: #dc3545;
+  }
+
+  .btn-delete:hover {
+    background-color: #c82333;
+  }
+</style>
+{% endblock %}
