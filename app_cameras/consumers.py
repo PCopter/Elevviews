@@ -1,15 +1,11 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from aiortc import RTCSessionDescription , RTCPeerConnection
+from aiortc import RTCSessionDescription, RTCPeerConnection
 
 class WebRTCConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
-
-    async def disconnect(self, close_code):
-        pass
-
-
+        self.pc = RTCPeerConnection()  # ✅ สร้าง PeerConnection ที่นี่
 
     async def receive(self, text_data):
         data = json.loads(text_data)
@@ -18,28 +14,19 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
             offer_sdp = data['sdp']
             offer = RTCSessionDescription(sdp=offer_sdp, type='offer')
 
-            if not hasattr(self, "pc"):
-                self.pc = RTCPeerConnection()
-            
+            # ตั้ง RemoteDescription จาก Offer ที่ได้รับ
+            await self.pc.setRemoteDescription(offer)
 
-            # สร้าง Answer (ในกรณีนี้เราไม่ต้องการเสียง)
-            answer = await self.pc.createAnswer({
-                'offerToReceiveVideo': True,   # รับวิดีโอ
-                'offerToReceiveAudio': False,  # ไม่รับเสียง
-                'video': {
-                    'width': 1920,
-                    'height': 1080,
-                    'frameRate': 30
-                }
-            })
+            # ✅ สร้าง Answer
+            answer = await self.pc.createAnswer()
+            await self.pc.setLocalDescription(answer)  # ✅ ตั้งค่า LocalDescription
 
-            # ส่ง SDP Answer กลับไป
+            # ✅ ส่ง SDP Answer กลับไป
             await self.send(json.dumps({
                 'type': 'answer',
-                'sdp': answer.sdp
+                'sdp': self.pc.localDescription.sdp
             }))
-            
-        
+
     async def disconnect(self, close_code):
         if hasattr(self, "pc"):
             await self.pc.close()
