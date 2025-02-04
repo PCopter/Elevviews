@@ -66,7 +66,7 @@ def take_photo(request, camera_id):
                 }
             }
             response = iot_client.update_thing_shadow(
-                thingName=os.getenv("THING_NAME"),
+                thingName=THING_NAME,
                 payload=json.dumps(shadow_payload)
             )
 
