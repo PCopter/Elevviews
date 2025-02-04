@@ -9,9 +9,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 import os
 from django.conf import settings
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # AWS IoT Core Configuration
 
