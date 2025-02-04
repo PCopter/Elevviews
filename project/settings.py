@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'app_cameras.apps.AppCameraConfig',
     
 ]
-ASGI_APPLICATION = "myproject.asgi.application"
+ASGI_APPLICATION = "project.asgi.application"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
