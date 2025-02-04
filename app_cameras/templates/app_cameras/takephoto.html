@@ -63,7 +63,7 @@
         document.getElementById('video').srcObject = event.streams[0];
     };
 
-    const ws = new WebSocket("ws://yourserver.com/ws/signaling/");
+    const ws = new WebSocket("ws://18.140.53.117:8000/ws/signaling/");
     
     ws.onmessage = async (event) => {
         const data = JSON.parse(event.data);
