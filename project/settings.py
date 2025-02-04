@@ -40,6 +40,8 @@ ALLOWED_HOSTS = ["18.140.53.117"]
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',  # ใช้ Daphne แทน ASGI Server
+    'channels',
     'app_users.apps.AppUsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,6 +53,7 @@ INSTALLED_APPS = [
     'app_cameras.apps.AppCameraConfig',
     
 ]
+ASGI_APPLICATION = "myproject.asgi.application"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

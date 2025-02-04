@@ -10,6 +10,9 @@
   <p>Status: {{ camera.get_status_display }}</p>
 
   <div>
+
+    <video id="video" autoplay playsinline></video>
+
     <button id="take-photo-button">Take Photo</button>
     
 
@@ -49,6 +52,34 @@
         document.getElementById('result-message').textContent = `Error: ${error.error}`;
       }
     });
+
+    const pc = new RTCPeerConnection({
+        iceServers: [
+            { urls: "stun:stun.l.google.com:19302" },
+            { urls: "turn:TURN_SERVER:3478", username: "TURN_USERNAME", credential: "TURN_PASSWORD" }
+        ]
+    });
+
+    pc.ontrack = (event) => {
+        document.getElementById('video').srcObject = event.streams[0];
+    };
+
+    const ws = new WebSocket("ws://yourserver.com/ws/signaling/");
+    
+    ws.onmessage = async (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === "answer") {
+            await pc.setRemoteDescription(new RTCSessionDescription(data));
+        }
+    };
+
+    async function startWebRTC() {
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        ws.send(JSON.stringify({ type: "offer", sdp: offer.sdp }));
+    }
+
+    startWebRTC();
 
   </script>
 {% endblock %}

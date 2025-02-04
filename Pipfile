@@ -9,6 +9,8 @@ mysql-connector-python = "*"
 pillow = "*"
 boto3 = "*"
 python-dotenv = "*"
+channels = "*"
+daphne = "*"
 
 [dev-packages]
 
