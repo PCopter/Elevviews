@@ -78,9 +78,7 @@
       height: { ideal: 1080 },
       frameRate: { ideal: 30 }
     },
-    audio: {
-      echoCancellation: true
-    }
+    
   }
 
     async function startWebRTC() {
@@ -88,8 +86,6 @@
         await pc.setLocalDescription(offer);
         ws.send(JSON.stringify({ type: "offer", sdp: offer.sdp }));
     }
-
-   
 
     startWebRTC();
 

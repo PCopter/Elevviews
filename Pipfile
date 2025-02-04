@@ -11,6 +11,7 @@ boto3 = "*"
 python-dotenv = "*"
 channels = "*"
 daphne = "*"
+aiortc = "*"
 
 [dev-packages]
 
