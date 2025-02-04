@@ -59,7 +59,8 @@ def take_photo(request, camera_id):
                 "state": {
                     "desired": {
                         "camera": {
-                            "action": "capture_image",
+                            "action": "stream",
+                            # "action": "capture_image",
                             "params": params
                         }
                     }
@@ -113,7 +114,3 @@ def upload_photo(request):
         return JsonResponse({'message': 'Photo uploaded successfully!', 'photo_id': photo.id})
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
-
-
-
-
