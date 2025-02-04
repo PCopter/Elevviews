@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http.response import JsonResponse
 from .models import Camera, Photo
-from app_users.models import CustomUser
 import boto3
 import json
 import os
@@ -9,9 +8,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 import os
 from django.conf import settings
+from datetime import datetime
 
 # AWS IoT Core Configuration
-
+AWS_REGION = 'ap-southeast-1'
+AWS_ENDPOINT = 'your-endpoint.amazonaws.com'
+THING_NAME = "RaspPiCam"  # ชื่อ Thing ใน AWS IoT
 
 # AWS Boto3 IoT Data Client
 iot_client = boto3.client('iot-data',   region_name='ap-southeast-1', 
@@ -29,11 +31,6 @@ def camera(request, camera_id):
     one_camera = get_object_or_404(Camera, id=camera_id)
     context = {'camera': one_camera}
     return render(request, 'app_cameras/camera.html', context)
-
-
-
-from datetime import datetime
-
 
 
 @login_required
