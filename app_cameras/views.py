@@ -8,6 +8,7 @@ import os
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 import os
+from django.conf import settings
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -17,8 +18,8 @@ load_dotenv()
 
 # AWS Boto3 IoT Data Client
 iot_client = boto3.client('iot-data',   region_name='ap-southeast-1', 
-                      aws_access_key_id= os.getenv("AWS_ACCESS_KEY") ,
-                      aws_secret_access_key= os.getenv("AWS_SECRET_KEY") )
+                      aws_access_key_id= settings.AWS_ACCESS_KEY ,
+                      aws_secret_access_key= settings.AWS_SECRET_KEY )
 
 
 def cameras(request):
