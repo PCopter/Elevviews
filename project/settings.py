@@ -34,7 +34,7 @@ DEBUG = "True"
 # ALLOWED_HOSTS = [production_host] if production_host is not None else ["127.0.0.1"]
 # ALLOWED_HOSTS = ["192.168.0.109" , "127.0.0.1" , "192.168.164.129"]
 # ALLOWED_HOSTS = ["your-domain.com", "18.141.225.87"]
-ALLOWED_HOSTS = ["18.141.225.87"]
+ALLOWED_HOSTS = ["18.140.53.117"]
 
 
 # Application definition
