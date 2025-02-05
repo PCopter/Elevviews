@@ -189,5 +189,22 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
+# AWS_Config Iot core
 AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
 AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
+
+# AWS_Config S3 - IAM
+INSTALLED_APPS += ["storages"]
+
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = "elevview"
+AWS_S3_REGION_NAME = "ap-southeast-1"  # เช่น 'us-east-1'
+
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+
+# ตั้งค่าให้ใช้ S3 เป็นที่เก็บไฟล์สื่อ
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+# URL ที่ใช้เข้าถึงไฟล์บน S3
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
