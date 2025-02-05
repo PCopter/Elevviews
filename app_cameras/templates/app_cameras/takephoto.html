@@ -54,9 +54,9 @@
 
 
     const pc = new RTCPeerConnection({
-    iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: "turn:18.140.53.117:3478", username: "elevview", credential: "elevview01" }
+      iceServers: [
+      { urls: "stun:stun.l.google.com:19302" },
+      { urls: "turn:18.140.53.117:3478?transport=udp", username: "elevview", credential: "elevview01" }
     ]
 
     });
