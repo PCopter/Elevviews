@@ -38,10 +38,10 @@ ALLOWED_HOSTS = ["18.140.53.117" , "127.0.0.1"]
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'daphne',  # ใช้ Daphne แทน ASGI Server
     'channels',
+    'storages',
     'app_users.apps.AppUsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -194,7 +194,6 @@ AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
 AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
 
 # AWS_Config S3 - IAM
-INSTALLED_APPS += ["storages"]
 
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
