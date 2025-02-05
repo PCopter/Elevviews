@@ -12,6 +12,7 @@ python-dotenv = "*"
 channels = "*"
 daphne = "*"
 aiortc = "*"
+mysqlclient = "*"
 
 [dev-packages]
 

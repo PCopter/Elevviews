@@ -30,3 +30,5 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         if hasattr(self, "pc"):
             await self.pc.close()
+
+    
