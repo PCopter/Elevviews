@@ -1,11 +1,32 @@
 import json
+import cv2
+import asyncio
+from aiortc import RTCPeerConnection, MediaStreamTrack, RTCSessionDescription
 from channels.generic.websocket import AsyncWebsocketConsumer
-from aiortc import RTCSessionDescription, RTCPeerConnection
+
+class VideoStreamTrack(MediaStreamTrack):
+    kind = "video"
+
+    def __init__(self):
+        super().__init__()
+        self.cap = cv2.VideoCapture(0)  # ใช้กล้อง webcam (เปลี่ยนเป็นไฟล์หรือ RTSP ได้)
+
+    async def recv(self):
+        ret, frame = self.cap.read()
+        if not ret:
+            return None
+
+        # แปลง OpenCV Frame เป็น WebRTC Frame
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        return frame  # ส่งเฟรมวิดีโอไปยัง Client
+    
 
 class WebRTCConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
-        self.pc = RTCPeerConnection()  # ✅ สร้าง PeerConnection ที่นี่
+        self.pc = RTCPeerConnection()
+        self.video_track = VideoStreamTrack()
+        self.pc.addTrack(self.video_track)  # เพิ่มวิดีโอ track ลงใน WebRTC
 
     async def receive(self, text_data):
         data = json.loads(text_data)
