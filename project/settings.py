@@ -184,7 +184,7 @@ EMAIL_HOST_PASSWORD = 'aqbt gjtf rbws neuf'
 PASSWORD_RESET_TIMEOUT = 300
 
 
-MEDIA_URL = '/media/'
+# MEDIA_URL = '/media/'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
@@ -210,3 +210,4 @@ MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 AWS_S3_SIGNATURE_NAME = 's3v4'
 AWS_S3_FILE_OVERWRITE = False
 AWS_S3_VERIFY = True
+AWS_DEFAULT_ACL = None 
