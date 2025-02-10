@@ -91,30 +91,30 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'mysql.connector.django',
-        'ENGINE': 'django.db.backends.mysql',  
-        'NAME': os.getenv("DB_NAME"),
-        'USER' : os.getenv("DB_USER"),
-        'PASSWORD' : os.getenv("DB_PASSWORD"),
-        'HOST' : os.getenv("DB_HOST", "localhost"),
-        'PORT' : os.getenv("DB_PORT", "3306"),
-        'OPTIONS': {
-            'charset': 'utf8mb4', 
-        },
-    }
-
     # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'mydb',
-    #     'USER': 'Elevviews',
-    #     'PASSWORD': 'cC.053346532',
-    #     'HOST': 'localhost',
-    #     'PORT': '3306',
+    #     'ENGINE': 'mysql.connector.django',
+    #     'ENGINE': 'django.db.backends.mysql',  
+    #     'NAME': os.getenv("DB_NAME"),
+    #     'USER' : os.getenv("DB_USER"),
+    #     'PASSWORD' : os.getenv("DB_PASSWORD"),
+    #     'HOST' : os.getenv("DB_HOST", "localhost"),
+    #     'PORT' : os.getenv("DB_PORT", "3306"),
     #     'OPTIONS': {
-    #          'charset': 'utf8mb4', 
-    #      },
+    #         'charset': 'utf8mb4', 
+    #     },
     # }
+
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mydb',
+        'USER': 'Elevviews',
+        'PASSWORD': 'cC.053346532',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+             'charset': 'utf8mb4', 
+         },
+    }
 
 }
 
@@ -184,8 +184,8 @@ EMAIL_HOST_PASSWORD = 'aqbt gjtf rbws neuf'
 PASSWORD_RESET_TIMEOUT = 300
 
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # AWS_Config Iot core
@@ -199,13 +199,13 @@ AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = "elevview"
 AWS_S3_REGION_NAME = "ap-southeast-1"  # เช่น 'us-east-1'
 
-AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
 
 # ตั้งค่าให้ใช้ S3 เป็นที่เก็บไฟล์สื่อ
-# DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 # URL ที่ใช้เข้าถึงไฟล์บน S3
-# MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 
 AWS_S3_SIGNATURE_NAME = 's3v4'
 AWS_S3_FILE_OVERWRITE = False
