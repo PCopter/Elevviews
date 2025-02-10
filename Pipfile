@@ -13,6 +13,7 @@ channels = "*"
 daphne = "*"
 aiortc = "*"
 mysqlclient = "*"
+opencv-python = "*"
 
 [dev-packages]
 

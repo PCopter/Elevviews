@@ -59,8 +59,7 @@ def take_photo(request, camera_id):
                 "state": {
                     "desired": {
                         "camera": {
-                            "action": "stream",
-                            # "action": "capture_image",
+                            "action": "capture_image",
                             "params": params
                         }
                     }
