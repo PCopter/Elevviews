@@ -1,6 +1,8 @@
 from django.db import models
 from django.conf import settings
 
+
+
 # Create your models here.
 class Camera(models.Model):
 
@@ -9,7 +11,9 @@ class Camera(models.Model):
     name = models.CharField(max_length=100, unique=True)
     name_thai = models.CharField(max_length=100, unique=True,blank=True, null=True)
 
-    image = models.CharField(max_length=100, null=True, blank=True)
+    image = models.CharField(max_length=200, null=True, blank=True)
+    
+    preview_image = models.CharField(max_length=200, null=True, blank=True)
 
     # พิกัดตำแหน่งของกล้อง (ละติจูดและลองจิจูด)
     latitude = models.FloatField()
@@ -51,9 +55,15 @@ class Photo(models.Model):
     # เชื่อมโยงรูปภาพกับกล้อง
     camera = models.ForeignKey(Camera, on_delete=models.CASCADE)
     # ไฟล์รูปภาพที่ถูกอัพโหลด media/photos
-    image = models.ImageField(upload_to='user_photos/')
+    image = models.URLField()
     # เวลาและวันที่ที่ถ่ายภาพ
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Photo by {self.user.username} from {self.camera.name} on {self.timestamp}"
+    
+
+
+    
+
+

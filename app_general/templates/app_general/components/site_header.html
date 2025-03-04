@@ -1,127 +1,86 @@
-<!-- <header class="site-header">
-  <a class="site-header-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
-    <i class=" fa fa-home" aria-hidden="true"></i>
-    <span>Home</span>
-  </a> -->
-
-  <!-- <a class="site-header-item {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}">
-    <i class="fa fa-info-circle" aria-hidden="true"></i>
-    <span>About</span>
-  </a>
-
-  <a class="site-header-item {% if request.resolver_match.url_name == 'cameras' %}active{% endif %}" href="{% url 'cameras' %}">
-    <i class="fa fa-camera" aria-hidden="true"></i>
-    <span>Camera</span>
-  </a>
-
-  {% if user.is_authenticated %}
-  <a class="site-header-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
-    <i class="fa fa-user" aria-hidden="true"></i>
-    <span>{{ user.username }}</span>
-  </a>
-  {% else %}
-  <a class="site-header-item {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">
-    <i class="fa fa-sign-in" aria-hidden="true"></i>
-    <span>Login</span>
-    <button>Sign up</button>
-  </a>
-  {% endif %}
-</header> -->
-
-
 <header class="header">
-  <!-- <div class="logo"></div> -->
-  <div><p class="text-logo">ElevView</p></div>
+  <div>
+    <a class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}" style="text-decoration: none;">
+      <p class="text-logo">ElevView</p>
+    </a>
+  </div>
+
   <div class="menu">
-
     {% if user.is_authenticated %}
-    <a class="site-header-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
-      <button>{{ user.username }}</button>
-    </a>
+    
+    <!-- <a class="site-header-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}"></a>  -->
+      <!-- 🔔 ปุ่ม username เปลี่ยนเป็นเปิด sidebar -->
+      <button id="openSidebar" class="logged-in">{{ user.username }}</button>
+    
     {% else %}
-    <a class="site-header-item {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'signup' %}">
-      <span><button>Sign Up</button></span>
-      
-    </a>
+      {% if request.resolver_match.url_name == 'login' %}
+        <p class="account-text">Don’t have an account?</p>
+        <a class="site-header-item {% if request.resolver_match.url_name == 'signup' %}active{% endif %}" href="{% url 'signup' %}">
+          <button>Sign up</button>
+        </a>
+      {% elif request.resolver_match.url_name == 'signup' %}
+        <p class="account-text">Already have an account?</p>
+        <a class="site-header-item {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">
+          <button>Log In</button>
+        </a>
+      {% else %}
+        <a class="site-header-item {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">
+          <button>Log In</button>
+        </a>
+      {% endif %}
     {% endif %}
-      
-
-
   </div>
 </header>
 
 
+<!-- 🧩 Overlay เมื่อ sidebar เปิด -->
+<div id="overlay" class="overlay hidden"></div>
+
+<!-- 🧩 Sidebar -->
+<aside id="sidebar" class="sidebar">
+  <button id="closeSidebar" class="close-btn"></button>
+  <nav class="sidebar-nav">
+    <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><i class="fa fa-picture-o"></i>Your photo</a>
+    <a href="{% url 'profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}"><i class="fa fa-user" ></i>Profile</a>
+    <a href="{% url 'password_change' %}" class="{% if request.resolver_match.url_name == 'password_change' %}active{% endif %}"><i class="fa fa-pencil"></i>Change Password</a>
+  </nav>
+  <hr>
+  <form action="{% url 'logout' %}" method="post" class="logout-form">
+    {% csrf_token %}
+    <button type="submit" class="logout-btn"><i class="fa fa-sign-out"></i>Log out</button>
+  </form>
+</aside>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  const openBtn = document.getElementById('openSidebar');
+  const closeBtn = document.getElementById('closeSidebar');
+  const links = document.querySelectorAll('.sidebar-nav a');
+
+  const openSidebar = () => {
+    sidebar.classList.add('active');
+    overlay.classList.add('active');
+  };
+
+  const closeSidebar = () => {
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+  };
+
+  openBtn.addEventListener('click', openSidebar);
+  closeBtn.addEventListener('click', closeSidebar);
+  overlay.addEventListener('click', closeSidebar);
+  links.forEach(link => link.addEventListener('click', closeSidebar));  // คลิก link ปิด sidebar
+});
+
+</script>
+
+
 <style>
   /* Site Header */
-
-
-/* .site-header {
-  background-color: white;
-  border-bottom: 1px solid rgb(212, 212, 212);
-  box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  height: 70px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-
-}
-
-.site-header-item {
-  color: #111111;
-  background-color: rgba(0, 0, 0, 0);
-  font-weight: 400;
-  padding: 5px;
-  width: 50px;
-  height: 50px;
-  border-radius: 15px;
-  text-decoration: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 5px 10px;
-  transition: background-color 300ms, color 300ms;
-}
-
-.site-header-item span {
-  font-size: 12px;
-  margin-top: 4px;
-  
-} */
-
-/* ปรับขนาดไอคอน */
-/* .site-header-item i {
-  font-size: 1.5rem;
-  margin-bottom: -2px;
-}
-
-.site-header-item:hover {
-  background-color: rgba(0, 0, 0, 0.1);
-  color: #000;
-  transform: scale(1.1);
-}
-
-.site-header-item.active {
-  background-color: rgba(0, 0, 0, 0.1);
-  color: #d9a2fd;
-} */
-
-/* responsive */
-/* @media (max-width: 768px) {
-  .site-header {
-      height: 60px;
-  }
-
-  .site-header-item span {
-      font-size: 10px;
-      font-weight: 200;
-  }
-} */
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -160,9 +119,9 @@
             background: black;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 12px;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 8px;
         }
 
         .main {
@@ -178,4 +137,122 @@
             font-size: 1.2em;
             color: #666;
         }
+
+        .account-text {
+          color: #333;
+          font-size: 10px;
+          margin-right: -8px;
+          margin-top: 10px;
+      }
+
+      .menu .logged-in {
+        background: white;
+        color: black;
+        border: 1px solid black;
+    }
+
+    /* Overlay */
+.overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 10;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+}
+.overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0; right: -100%;
+  width: 60%;
+  height: 100%;
+  background: #fff;
+  box-shadow: -2px 0 8px rgba(0,0,0,0.2);
+  z-index: 20;
+  padding: 1.5rem;
+  transition: right 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar.active {
+  right: 0;
+}
+
+/* ปุ่มปิด */
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+/* ลิงก์ใน sidebar */
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+  padding: 15px 10px;
+  font-size: 16px;
+  text-align: left;
+}
+.sidebar-nav a.active {
+  background-color: #343a40;
+  color: #fff;
+  border-radius: 6px;
+}
+.sidebar-nav a:hover {
+  background-color: #e9ecef;
+}
+
+.sidebar-nav a i {
+  margin-right: 10px; /* ระยะห่างระหว่างไอคอนกับตัวหนังสือ */
+  font-size: 18px;
+  width: 20px; /* ให้ไอคอนมีความกว้างคงที่เพื่อจัดระเบียบ */
+  text-align: center;
+}
+/* Logout */
+.logout-form {
+  padding: 0;
+  margin: 0;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #d9534f;
+  padding: 15px 10px;
+  text-align: left;
+}
+
+.logout-btn i {
+  margin-right: 10px; /* ระยะห่างไอคอนกับข้อความ */
+  font-size: 18px;
+  width: 20px;
+  text-align: center;
+}
+
+/* ปรับให้ logout ชิดกับลิงค์ด้านบน */
+.sidebar .logout-form {
+  margin-top: 0;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid #000; /* เส้นสีดำกั้น */
+  margin: 15px 0;
+}
 </style>

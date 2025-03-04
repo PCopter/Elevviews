@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Camera, Photo
+from django.utils.html import format_html
 
 # Customizing the Camera admin panel
 @admin.register(Camera)
@@ -20,7 +21,7 @@ class PhotoAdmin(admin.ModelAdmin):
     # Displaying a preview of the photo in the admin panel
     def photo_preview(self, obj):
         if obj.image:
-            return f'<img src="{obj.image.url}" style="width: 100px; height: auto;" />'
+            return format_html('<img src="{}" style="width: 100px; height: auto;" />', obj.image)
         return "No image available"
-    photo_preview.allow_tags = True
+   
     photo_preview.short_description = "Photo Preview"

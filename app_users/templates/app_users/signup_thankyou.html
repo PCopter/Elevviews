@@ -1,16 +1,21 @@
 {% extends 'app_general/components/base.html' %}
 
 {% block site_title %}
-Thank you for registering|
+Thank you for registering |
 {% endblock %}
 
 {% block content %}
 <section class="content-section content-section-single">
   <div class="content-container content-container-narrow">
-    <h2 class="content-title">Thank you for registering.</h2>
-    <p>Please check your email and activate your account.</p>
-    <a class="button button-primary" href="{% url 'login' %}">Log in</a>
+    <h1 class="text-center text-logo-elevview">ELEVVIEW</h1>
+    <p class="content-title" style="font-size: 24px; color: #333333; font-weight: 400;">Thank you for registering.</p>
+    <div style="max-width: 70%; margin: auto;">
+      <p class="content-title" style="margin-top: -25px; font-size: 20px; color: #44484F;">Please check your email and activate your account.</p>
+    </div>
+    <button class="button button-login"><a style="text-decoration: none; color: white;" href="{% url 'login' %}">Log in</a></button>
+    
 
   </div>
 </section>
 {% endblock %}
+

@@ -9,6 +9,8 @@ urlpatterns = [
     path("dashboard", view=views.dashboard, name = "dashboard"),
     path("profile", view=views.profile, name = "profile"),
     path('delete-photo/<int:photo_id>/', views.delete_photo, name='delete_photo'),
+    path('login-redirect/', views.login_redirect, name='login_redirect'),
+    path("save-engagement/", view=views.save_engagement, name="save_engagement"),
 ] 
 
 

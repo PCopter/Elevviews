@@ -34,14 +34,11 @@ DEBUG = "True"
 # ALLOWED_HOSTS = [production_host] if production_host is not None else ["127.0.0.1"]
 # ALLOWED_HOSTS = ["192.168.0.109" , "127.0.0.1" , "192.168.164.129"]
 # ALLOWED_HOSTS = ["your-domain.com", "18.141.225.87"]
-ALLOWED_HOSTS = ["18.140.53.117" , "127.0.0.1"]
+ALLOWED_HOSTS = ["18.140.53.117" , "127.0.0.1" , "192.168.0.104" ]
 
 
 # Application definition
 INSTALLED_APPS = [
-    'daphne',  # ใช้ Daphne แทน ASGI Server
-    'channels',
-    'storages',
     'app_users.apps.AppUsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,9 +48,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app_general.apps.AppGeneralConfig',
     'app_cameras.apps.AppCameraConfig',
+    'storages',
     
 ]
-ASGI_APPLICATION = "project.asgi.application"
+# ASGI_APPLICATION = "project.asgi.application"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -102,7 +100,7 @@ DATABASES = {
     #     'OPTIONS': {
     #         'charset': 'utf8mb4', 
     #     },
-    # }
+    # } 
 
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -162,7 +160,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Auth
-LOGIN_REDIRECT_URL = "home"
+LOGIN_REDIRECT_URL = '/users/login-redirect/'
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_URL = "login"
 
@@ -184,30 +182,49 @@ EMAIL_HOST_PASSWORD = 'aqbt gjtf rbws neuf'
 PASSWORD_RESET_TIMEOUT = 300
 
 
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # AWS_Config Iot core
 AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
 AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
 
-# AWS_Config S3 - IAM
 
+
+# AWS_Config S3 - IAM
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = "elevview"
-AWS_S3_REGION_NAME = "ap-southeast-1"  # เช่น 'us-east-1'
-
-AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
-
-# ตั้งค่าให้ใช้ S3 เป็นที่เก็บไฟล์สื่อ
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-
-# URL ที่ใช้เข้าถึงไฟล์บน S3
-MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
-
+AWS_STORAGE_BUCKET_NAME = "elevviews"
 AWS_S3_SIGNATURE_NAME = 's3v4'
+AWS_S3_REGION_NAME = "ap-southeast-1"  # เช่น 'us-east-1'
 AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
 AWS_S3_VERIFY = True
-AWS_DEFAULT_ACL = None 
+USE_S3 = True
+
+# AWS_Config Kvs
+KINESIS_VIDEO_STREAM_NAME = 'Elevview'
+AWS_KVS_REGION_NAME = "ap-southeast-1"
+
+STORAGES = {
+
+    # Media file (image) management   
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
+    },
+    
+    # CSS and JS file management
+    "staticfiles": {
+        # "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
+    },
+}
+# URL ที่ใช้เข้าถึงไฟล์บน S3
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
+# AWS_S3_CUSTOM_DOMAIN = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+# MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
+
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+

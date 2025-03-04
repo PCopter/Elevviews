@@ -13,7 +13,7 @@
       {% for camera in cameras %}
         <div class="card">
           <div class="card-image">
-            <img src="{% static camera.image %}" alt="{{ camera.name }}">
+            <img src="{{ camera.image|safe }}" alt="Camera Name">
             <div class="status-badge">
               {% if camera.status == "Online" %}
                 <span class="status online">Online</span>
@@ -22,6 +22,7 @@
               {% endif %}
             </div>
           </div>
+          
           <div class="card-content">
             <div class="card-text">
               <h5 class="name">{{ camera.name }}</h5>
@@ -37,5 +38,7 @@
 </section>
 </div>
 {% endblock %}
+
+
 
 

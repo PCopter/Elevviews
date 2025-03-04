@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://unpkg.com/amazon-kinesis-video-streams-webrtc/dist/kvs-webrtc.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.585.0.min.js"></script>
+</head>
+<body>
+    <video id="localVideo" autoplay playsinline muted></video>
+    <video id="remoteVideo" autoplay playsinline></video>
+
+    <script>
+        async function startViewer() {
+            const response = await fetch('/cameras/get_kvs_credentials/');
+            const data = await response.json();
+            
+            const { accessKeyId, secretAccessKey, region, channelARN, endpoints } = data;
+            const clientId = "my-viewer-client";
+
+            AWS.config.update({
+                region: region,
+                credentials: new AWS.Credentials(accessKeyId, secretAccessKey),
+            });
+
+            const signalingClient = new KVSWebRTC.SignalingClient({
+                channelARN,
+                channelEndpoint: endpoints.WSS,
+                clientId,
+                role: KVSWebRTC.Role.VIEWER,
+                region,
+                credentials: {
+                    accessKeyId,
+                    secretAccessKey,
+                },
+            });
+
+            const peerConnection = new RTCPeerConnection({
+                iceServers: [
+                    { urls: `stun:stun.kinesisvideo.${region}.amazonaws.com:443` },
+                ],
+            });
+
+            signalingClient.on("open", async () => {
+                const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                document.getElementById("localVideo").srcObject = localStream;
+                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+                signalingClient.sendSdpOffer(peerConnection.localDescription);
+            });
+
+            signalingClient.on("sdpAnswer", async answer => {
+                await peerConnection.setRemoteDescription(answer);
+            });
+
+            signalingClient.on("iceCandidate", candidate => {
+                peerConnection.addIceCandidate(candidate);
+            });
+
+            peerConnection.addEventListener("icecandidate", ({ candidate }) => {
+                if (candidate) {
+                    signalingClient.sendIceCandidate(candidate);
+                }
+            });
+
+            peerConnection.addEventListener("track", event => {
+                document.getElementById("remoteVideo").srcObject = event.streams[0];
+            });
+
+            signalingClient.open();
+        }
+
+        startViewer();
+    </script>
+</body>
+</html>

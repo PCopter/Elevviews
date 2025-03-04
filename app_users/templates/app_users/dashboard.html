@@ -7,24 +7,10 @@
 {% block content %}
 <section class="content-section content-section-single">
   <div class="content-container content-container-narrow">
-    <h2 class="content-title">Dashboard of {{ user.username }}</h2>
 
-    <p>
-      <a href="{% url 'dashboard' %}">Dashboard</a>
-      <a href="{% url 'profile' %}">Profile</a>
-      <a href="{% url 'password_change' %}">Change password</a>
-    </p>
+    <h2 class="content-title">Your Photos</h2>
 
-    <div class="site-header-item">
-      <form action="{% url 'logout' %}" method="post">
-        {% csrf_token %}
-        <button type="submit" style="border: none; background: none; color: inherit; cursor: pointer; padding: 0; color: rgb(41, 41, 41);">
-          <span>Log out</span>
-        </button>
-      </form>
-    </div>
 
-    <h3>Your Photos</h3>
 
 
   {% if user_photos %}
@@ -32,20 +18,31 @@
 
       {% for photo in user_photos %}
       <div class="photo-item">
-        <img src="{{ photo.image.url }}" alt="Photo taken with {{ photo.camera.name }}" />
-        <p>Taken with: {{ photo.camera.name }}</p>
-        <p>Date: {{ photo.timestamp|date:"F j, Y, g:i a" }}</p>
+        <img src="{{ photo.image }}" alt="Photo taken with {{ photo.camera.name }}" />
 
-        <!-- ปุ่มสำหรับดาวน์โหลดรูปภาพ -->
-        <a href="{{ photo.image.url }}" download="{{ photo.image.name }}" class="btn btn-download">Download</a>
+        <div class="photo-info">
+          <p><strong>Taken with: {{ photo.camera.name }}</strong></p>
+          <p class="photo-date"><strong>Date: {{ photo.timestamp|date:"F j, Y" }}</strong></p>
+        </div>
 
-        <!-- ปุ่มสำหรับลบรูปภาพ -->
-        <form method="POST" action="{% url 'delete_photo' photo.id %}" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-delete">Delete</button>
-        </form>
+
+        <div style="margin-top: -5px; padding-bottom: 10px;">
+          <!-- ปุ่มสำหรับดาวน์โหลดรูปภาพ -->
+           <!-- ปุ่มสำหรับเปิดฟอร์ม Popup -->
+           <button class="btn btn-download" onclick="openPopup({{ photo.id }})">
+            <i class="fa fa-cloud-download" style="margin-right: 5px;"></i> Download
+          </button>
+
+          <!-- ปุ่มสำหรับลบรูปภาพ -->
+          <form method="POST" action="{% url 'delete_photo' photo.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-delete"><i class="fa fa-trash-o" style="margin-right: 5px;"></i> Delete</button>
+          </form>
+        </div>
+
       </div>
     {% endfor %}
+
 
   </div>
 
@@ -56,19 +53,123 @@
 
 
 </section>
+<!-- Overlay สำหรับทำให้พื้นหลังมืดลง -->
+<div class="popup-overlay"></div>
+
+<!-- Popup Form -->
+<div id="downloadPopup" class="popup">
+  <div class="popup-content">
+    <span class="close-btn" onclick="closePopup()">&times;</span>
+    <h3 style="margin-bottom: -10px;">Feedback</h3>
+    <form id="downloadForm">
+      {% csrf_token %}
+      <input type="hidden" id="photo_id" name="photo_id">
+
+      <!-- คำถาม 3: ระดับความพึงพอใจสำหรับสถานที่ -->
+      <div class="emoji-rating-container" style="margin-bottom: 30px;">
+        <label><p class="questionlabel"> Rate your experience for location </p></label>
+        <div class="emoji-rating">
+          <span data-value="1" data-label="Worst">😡 <span class="emoji-label-text">Worst</span></span>
+          <span data-value="2" data-label="Dislike">☹️ <span class="emoji-label-text">Dislike</span></span>
+          <span data-value="3" data-label="Neutral">😐 <span class="emoji-label-text">Neutral</span></span>
+          <span data-value="4" data-label="Good">🙂 <span class="emoji-label-text">Good</span></span>
+          <span data-value="5" data-label="Awesome!">😃 <span class="emoji-label-text">Awesome!</span></span>
+        </div>
+        <input type="hidden" name="location_satisfaction" id="locationSatisfactionInput" required>
+      </div>
+
+      <!-- คำถาม 1: เหตุผลหลักในการมาเยือน (เลือกหลายข้อ) -->
+      <div class="question">
+        <label><p class="questionlabel">What was the main reason for your visit? (You may select more than one)</p></label>
+        <div class="custom-checkbox-group" id="reasons_for_visit_group">
+            {% for key, value in REASON_CHOICES %}
+            <label class="custom-checkbox">
+                <input type="checkbox" name="reasons_for_visit" value="{{ key }}">
+                <span class="checkmark"></span> {{ value }}
+            </label>
+            {% endfor %}
+        </div>
+      </div>
+
+      <!-- คำถาม 7: วางแผนล่วงหน้ากี่วัน (เลือกได้ข้อเดียว) -->
+      <div class="question">
+        <label><p class="questionlabel">How far in advance did you plan your trip to this place?</p></label>
+        <div class="custom-checkbox-group" id="planning_ahead_group">
+            {% for key, value in PLANNING_CHOICES %}
+            <label class="custom-checkbox">
+                <input type="radio" name="planning_ahead" value="{{ key }}">
+                <span class="checkmark"></span> {{ value }}
+            </label>
+            {% endfor %}
+        </div>
+      </div>
+
+      <!-- คำถาม 2: มากับใคร (เลือกได้ข้อเดียว) -->
+      <div class="question">
+        <label><p class="questionlabel">Who did you travel with on this trip?</p></label>
+        <div class="custom-checkbox-group" id="travel_with_group">
+            {% for key, value in TRAVEL_WITH_CHOICES %}
+            <label class="custom-checkbox">
+                <input type="radio" name="travel_with" value="{{ key }}">
+                <span class="checkmark"></span> {{ value }}
+            </label>
+            {% endfor %}
+        </div>
+      </div>
+
+      <!-- คำถาม 4: ความคิดเห็นเพิ่มเติมสำหรับสถานที่ -->
+      <div class="comment-container">
+        <label><p class="questionlabel"> Your comment for this location (Optional) </p></label>
+        <textarea name="location_comment" placeholder="Describe your experience here"></textarea>
+      </div>
+
+      <!-- คำถาม 5: ระดับความพึงพอใจสำหรับ Elevview -->
+      <div style="margin-bottom: 30px;">
+        <label><p class="questionlabel"> Rate your experience for Elevview </p></label>
+        <div class="emoji-rating">
+          <span data-value="1" data-label="Worst">😡 <span class="emoji-label-text">Worst</span></span>
+          <span data-value="2" data-label="Dislike">☹️ <span class="emoji-label-text">Dislike</span></span>
+          <span data-value="3" data-label="Neutral">😐 <span class="emoji-label-text">Neutral</span></span>
+          <span data-value="4" data-label="Good">🙂 <span class="emoji-label-text">Good</span></span>
+          <span data-value="5" data-label="Awesome!">😃 <span class="emoji-label-text">Awesome!</span></span>
+        </div>
+        <input type="hidden" name="elevview_satisfaction" id="satisfactionInput" required>
+      </div>
+
+      <!-- คำถาม 6: ความคิดเห็นเพิ่มเติมสำหรับ Elevview -->
+      <div class="comment-container">
+        <label><p class="questionlabel"> Your comment for Elevview (Optional) </p></label>
+        <textarea name="elevview_comment" placeholder="Describe your experience here"></textarea>
+      </div>
+
+      
+
+      <button type="submit" class="btnsubmit btn-download">Submit & Download</button>
+    </form>
+  </div>
+</div>
+
+<!-- FontAwesome สำหรับไอคอน -->
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> -->
 
 <style>
+  /* Gellery */
+  .photo-date {
+    color: #6c757d;
+  }
   .photo-gallery {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
+    max-width: 90%;
+    margin: auto;
   }
   .photo-item {
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    padding: 0px;
+    border-radius:12px;
     text-align: center;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
   }
   .photo-item img {
     max-width: 100%;
@@ -76,32 +177,440 @@
     border-radius: 8px;
   }
 
+  .photo-info {
+    padding: 0px 30px;
+    text-align: left;
+  }
+
+  .photo-info strong {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .photo-info p {
+    font-weight: 300;
+    margin: auto;
+    font-size: 14px;
+  }
+
   .btn {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 8px 18px;
     margin-top: 10px;
     font-size: 14px;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     text-decoration: none;
     color: #fff;
+    width: 45%;
+    margin-left: 5px;
+  }
+  .btnsubmit {
+    display: inline-block;
+    padding: 18px 8px;
+    margin-top: 10px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #fff;
+    width: 100%;
   }
 
-  .btn-download {
-    background-color: #28a745;
-  }
-
-  .btn-download:hover {
-    background-color: #218838;
-  }
 
   .btn-delete {
-    background-color: #dc3545;
+    background-color: 	white;
+    color: #c22242 ;
+    border: solid 1px;
   }
 
-  .btn-delete:hover {
-    background-color: #c82333;
-  }
+
+
+
+/* ปรับแต่ง Popup */
+.popup {
+    z-index: 10; /* อยู่ด้านหน้า Overlay */
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 25px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+    width: 370px; /* ขยายความกว้าง */
+    border-radius: 15px; /* เพิ่มความโค้ง */
+    font-family: 'Arial', sans-serif;
+    
+    /* ✅ แก้ปัญหาการเลื่อน */
+    max-height: 90vh; /* ไม่ให้สูงเกิน 80% ของหน้าจอ */
+    overflow-y: auto; /* เพิ่มการเลื่อนแนวตั้ง */
+}
+
+
+/* ปรับแต่งภายใน Popup */
+.popup-content {
+    max-width: 90%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* สร้างพื้นหลังมืด (Overlay) */
+.popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* สีดำโปร่งแสง */
+    z-index: 9; /* อยู่ต่ำกว่าตัว Popup */
+}
+
+/* ปรับแต่งปุ่มปิด */
+.close-btn {
+    cursor: pointer;
+    color: #ff4d4d;
+    font-size: 22px;
+    font-weight: bold;
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    transition: color 0.3s;
+}
+
+.close-btn:hover {
+    color: #d60000;
+}
+
+/* ปรับแต่ง Label */
+.popup label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* ปรับแต่ง Select (Dropdown) */
+.popup select {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #f9f9f9;
+    cursor: pointer;
+    transition: border 0.3s;
+}
+
+.popup select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* ปรับแต่ง Textarea */
+.popup textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #f9f9f9;
+    resize: vertical;
+    transition: border 0.3s;
+}
+
+.popup textarea:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* ปรับแต่งอิโมจิ Rating */
+.emoji-rating {
+    display: flex;
+    justify-content: space-around;
+    font-size: 32px; /* ขยายขนาดอิโมจิ */
+    margin-top: 10px;
+    position: relative;
+}
+
+/* ปรับแต่ง Emoji */
+.emoji-rating span {
+    cursor: pointer;
+    transition: transform 0.3s, background-color 0.3s;
+    padding: 10px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+}
+
+/* เมื่อถูกเลือก */
+.emoji-rating span.selected {
+    transform: scale(1.5);
+    text-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);
+    background-color: #8ebdee; /* พื้นหลังสีฟ้า */
+    color: white;
+}
+
+/* ข้อความใต้ Emoji */
+.emoji-rating .emoji-label-text {
+    font-size: 12px;
+    font-weight: bold;
+    color: transparent; /* ซ่อนค่าเริ่มต้น */
+    position: absolute;
+    bottom: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: color 0.3s ease-in-out;
+}
+
+/* เปลี่ยนสีข้อความใต้ Emoji เมื่อถูกเลือก */
+/* เปลี่ยนสีข้อความใต้ Emoji เมื่อถูกเลือก */
+.emoji-rating span.selected .emoji-label-text {
+    color: #b3cce7; /* สีฟ้า */
+}
+
+
+/* ปรับแต่ง Textarea */
+textarea {
+    width: 100%;
+    min-height: 120px; /* ความสูงเริ่มต้น */
+    max-height: 300px; /* จำกัดความสูง */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    resize: vertical; /* ให้ขยายขึ้น-ลงได้ */
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+/* เปลี่ยนสีเส้นขอบเมื่อ textarea ถูกคลิก */
+textarea:focus {
+    border-color: #007BFF;
+    box-shadow: 0px 0px 8px rgba(0, 123, 255, 0.3);
+    outline: none;
+}
+/* ปรับแต่ง Placeholder */
+textarea::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+/* จัดกลุ่มคำถาม */
+.question {
+    margin-bottom: 20px;
+}
+
+/* สไตล์สำหรับคำถาม */
+.questionlabel {
+    text-align: left; /* ชิดซ้าย */
+    font-size: 16px; /* ตัวใหญ่ขึ้นเล็กน้อย */
+    color: #0e0d0d; /* สีเข้มขึ้น */
+    font-weight: bold; /* ทำให้ตัวหนา */
+    margin-bottom: 8px; /* เพิ่มช่องว่างด้านล่าง */
+}
+
+/* กำหนดรูปแบบ checkbox */
+.custom-checkbox-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left; /* จัดข้อความชิดซ้าย */
+}
+
+/* สไตล์ตัวเลือก */
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 6px 6px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    font-size: 16px;
+    align-items: flex-start; /* ทำให้ข้อความขึ้นบรรทัดใหม่ตรงกับต้นบรรทัดแรก */
+}
+
+/* ซ่อน checkbox ปกติ */
+.custom-checkbox input {
+    display: none;
+}
+
+/* กำหนดสไตล์ Checkmark */
+.checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 12px;
+    position: relative;
+}
+
+/* เมื่อเลือก checkbox แล้ว ให้แสดงเครื่องหมายถูก */
+.custom-checkbox input:checked + .checkmark::after {
+    content: "✔";
+    font-size: 16px;
+    color: #007BFF;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 </style>
+
+<script>
+document.querySelectorAll(".emoji-rating span").forEach(span => {
+    span.addEventListener("click", function() {
+        let parent = this.parentElement;
+
+        // Remove 'selected' class from all emojis in the same group
+        parent.querySelectorAll("span").forEach(s => s.classList.remove("selected"));
+
+        // Add 'selected' class to clicked emoji
+        this.classList.add("selected");
+
+        // Update hidden input based on the emoji selection
+        let inputField = parent.nextElementSibling;  // Get the associated hidden input
+        inputField.value = this.getAttribute("data-value");
+
+        // Ensure text label updates properly
+        parent.querySelectorAll(".emoji-label-text").forEach(label => {
+            label.style.color = "transparent"; // Hide other labels
+        });
+
+        let labelText = this.querySelector(".emoji-label-text");
+        labelText.style.color = "#007BFF"; // Highlight selected label
+    });
+});
+
+document.getElementById("downloadForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // ป้องกันการส่งฟอร์มหากข้อมูลไม่ครบ
+
+    let locationRating = document.getElementById("locationSatisfactionInput").value;
+    let elevviewRating = document.getElementById("satisfactionInput").value;
+
+    let reasonsChecked = document.querySelectorAll("#reasons_for_visit_group input:checked").length > 0;
+    let travelWithChecked = document.querySelector("#travel_with_group input:checked") !== null;
+    let planningChecked = document.querySelector("#planning_ahead_group input:checked") !== null;
+
+    if (!locationRating || !elevviewRating || !reasonsChecked || !travelWithChecked || !planningChecked) {
+        alert("⚠️ กรุณากรอกข้อมูลให้ครบทุกข้อก่อนส่งแบบฟอร์ม!");
+
+        highlightMissingFields(reasonsChecked, travelWithChecked, planningChecked);
+        return;
+    }
+
+    // **ถ้ากรอกครบแล้ว ทำการส่งฟอร์มตามปกติ**
+    let formData = new FormData(this);
+    fetch("{% url 'save_engagement' %}", {
+      method: "POST",
+      body: formData,
+      headers: { "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        closePopup(); // ปิด Popup
+
+        setTimeout(() => {
+          if (data.download_url) {
+            window.location.href = data.download_url; // ดาวน์โหลดไฟล์
+          } else {
+            alert("Download URL not found!");
+          }
+
+          resetForm();  // รีเซ็ตค่าฟอร์มหลังจากดาวน์โหลดเสร็จ
+        }, 500);
+      } else {
+        alert("❌ มีข้อผิดพลาด กรุณาลองใหม่!");
+      }
+    })
+    .catch(error => console.error("Error:", error));
+});
+
+/** ✅ ฟังก์ชันไฮไลท์ช่องที่ยังไม่ได้เลือก */
+function highlightMissingFields(locationRating, elevviewRating) {
+    if (!locationRating) {
+        document.querySelector(".location-rating").style.border = "2px solid red";
+    } else {
+        document.querySelector(".location-rating").style.border = "none";
+    }
+
+    if (!elevviewRating) {
+        document.querySelector(".elevview-rating").style.border = "2px solid red";
+    } else {
+        document.querySelector(".elevview-rating").style.border = "none";
+    }
+}
+
+
+  function openPopup(photoId) {
+    document.getElementById("photo_id").value = photoId;
+    document.getElementById("downloadPopup").style.display = "block";
+    document.querySelector(".popup-overlay").style.display = "block"; // แสดง Overlay
+}
+
+function closePopup() {
+    document.getElementById("downloadPopup").style.display = "none";
+    document.querySelector(".popup-overlay").style.display = "none"; // ซ่อน Overlay
+}
+
+// ปิด Popup เมื่อคลิกที่ Overlay
+document.querySelector(".popup-overlay").addEventListener("click", closePopup);
+
+  document.getElementById("downloadForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    let formData = new FormData(this);
+    fetch("{% url 'save_engagement' %}", {
+      method: "POST",
+      body: formData,
+      headers: { "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        closePopup(); // ปิด Popup
+        setTimeout(() => {
+          if (data.download_url) {
+            window.location.href = data.download_url; // เปลี่ยนเป็นเปิด URL โดยตรง
+          } else {
+            alert("Download URL not found!");
+          }
+          resetForm();  // รีเซ็ตค่าฟอร์มหลังจากดาวน์โหลดเสร็จ
+        }, 500);
+      } else {
+        alert("Something went wrong!");
+      }
+    })
+    .catch(error => console.error("Error:", error));
+});
+
+/** ✅ ฟังก์ชันรีเซ็ตฟอร์ม */
+function resetForm() {
+    let form = document.getElementById("downloadForm");
+    form.reset(); // รีเซ็ตค่าในฟอร์ม
+
+    // รีเซ็ตการเลือกของ emoji-rating
+    document.querySelectorAll(".emoji-rating span").forEach(span => {
+        span.classList.remove("selected");
+    });
+
+    // รีเซ็ตค่า Hidden Input เป็นค่าว่าง
+    document.getElementById("locationSatisfactionInput").value = "";
+    document.getElementById("satisfactionInput").value = "";
+
+    // ซ่อนข้อความคะแนนที่เลือก
+    document.querySelectorAll(".emoji-label-text").forEach(label => {
+        label.style.color = "transparent";
+    });
+}
+</script>
 {% endblock %}

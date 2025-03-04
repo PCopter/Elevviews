@@ -1,102 +1,286 @@
 {% extends 'app_general/components/base.html' %}
+{% load static %}
 
 {% block site_title %}
   Take Photo - {{ camera.name }}
 {% endblock %}
 
 {% block content %}
-  <h1>Take Photo with {{ camera.name }}</h1>
-  <p>IP Address: {{ camera.ip_address }}</p>
-  <p>Status: {{ camera.get_status_display }}</p>
+  <h1 style="max-width: 70%; margin: auto;">Take Photo with {{ camera.name }}</h1>
+  
+  <div style="position: relative; display: inline-block; max-width: 80%;">
+    {% if camera is not None %}
+        <!-- รูปตัวอย่างจากกล้อง -->
+        <img id="previewImage" src="{{ camera.preview_image }}" alt="Camera Preview" 
+            style="width: 100%; border: 1px solid #ccc; border-radius: 5px;">
+        <!-- ลายน้ำ (สัมพันธ์กับขนาดรูป) -->
+        <img id="watermark-overlay" src="YOUR_WATERMARK_URL" alt="Watermark">
+
+        <!-- ปุ่มสลับลายน้ำ -->
+        <i class="fa fa-chevron-left watermark-toggle" data-direction="left"></i>
+        <i class="fa fa-chevron-right watermark-toggle" data-direction="right"></i>
+
+    {% else %}
+        <p style="color: red; max-width: 70%; margin: auto;">
+            Unable to fetch the preview image. Please try again later.
+        </p>
+    {% endif %}
+
+</div>
+  <div class="tip-box">
+    <i class="fa fa-lightbulb-o"></i> 
+    <span class="tip-text">
+        <strong>Tip :</strong> Taking a photo takes a moment. After pressing the capture button, there will be some time to pose.
+    </span>
+  </div>
 
   <div>
-
-    <video id="video" autoplay playsinline></video>
-
-    <button id="take-photo-button">Take Photo</button>
-
-    {% if latest_photo %}
-      <img src="{{ latest_photo.image.url }}" alt="Captured Photo" style="width: 300px; height: auto;" />
-      
-    {% else %}
-      <p>No photo captured yet.</p>
-    {% endif %}
-    <p id="result-message" style="color: green;"></p>
+    <button id="take-photo-button" class="btn btn-download">
+      <i class="fa fa-camera" aria-hidden="true"></i> Take Photo
+    </button>
   </div>
-    
 
+  <p id="result-message" style="color: green;"></p>
+
+  <!-- ส่วนแสดงผลภาพล่าสุด -->
+  <!-- <div id="photo-container" style="margin-top: 20px; text-align: center; max-width: 80%; margin: auto;">
+    {% if latest_photo %}
+  
+        <img src="{{ latest_photo.image.url }}" id="capturedPhoto" alt="Captured Photo" style="max-width: 100%; border: 1px solid #ccc;">
+      
+        <br>
+    {% endif %}
+  </div> -->
+
+    <!-- Popup Overlay -->
+    <div id="popup-overlay" class="popup-overlay">
+      <div class="popup-content">
+          <div id="lottie-animation" style="width: 150px; height: 150px;" class="lottie-container"></div>
+          <h2>Photo shoot completed</h2>
+          <p>Now you can download photo in your photos menu</p>
+      </div>
+    </div>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
   <script>
-    // Function to send capture image command
-    document.getElementById('take-photo-button').addEventListener('click', async () => {
-      document.getElementById('result-message').textContent = "Sending capture command to the camera...";
+    let animation = null;  // ตัวแปรเก็บ Animation
+     
+    document.addEventListener("DOMContentLoaded", function () {
+      let watermarks = ["none", "CPE"];
+      let currentWatermarkIndex = 1;
+      let watermarkOverlay = document.getElementById("watermark-overlay");
+
+      function updateWatermarkUI() {
+        if (watermarks[currentWatermarkIndex] === "none") {
+          watermarkOverlay.style.display = "none";
+        } else {
+          watermarkOverlay.src = "/static/app_cameras/test1.png";
+          watermarkOverlay.style.display = "block";
+        }
+      }
+
+      document.querySelectorAll(".watermark-toggle").forEach(btn => {
+        btn.addEventListener("click", function () {
+          currentWatermarkIndex = (this.classList.contains("fa-chevron-left"))
+            ? (currentWatermarkIndex - 1 + watermarks.length) % watermarks.length
+            : (currentWatermarkIndex + 1) % watermarks.length;
+          updateWatermarkUI();
+        });
+      });
+
+      
+      document.getElementById('take-photo-button').addEventListener('click', async () => {
+
+
+         // แสดง Popup หลังจาก 2 วินาที
+         setTimeout(() => {
+            document.getElementById('popup-overlay').style.display = 'flex';
+
+            if (!animation) {
+                animation = lottie.loadAnimation({
+                    container: document.getElementById('lottie-animation'),
+                    renderer: 'svg',
+                    loop: false,
+                    autoplay: true,
+                    path: "{% static 'json/Animation3.json' %}"
+                });
+            } else {
+                animation.goToAndPlay(0, true);  // รีเซ็ต Animation แล้วเล่นใหม่
+            }
+        }, 3000);
+    
+    
+    
       const response = await fetch(window.location.href, {
-        method: 'POST',
-        headers: {
-          'X-CSRFToken': '{{ csrf_token }}',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ action: 'capture_image' })
+          method: 'POST',
+          headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ action: 'capture_image' })
       });
 
       if (response.ok) {
-        const result = await response.json();
-        document.getElementById('result-message').textContent = result.message;
-        const img = document.getElementById('result-photo');
-        img.src = result.image_url;
-        img.style.display = 'block';
-
-        document.getElementById('photo-actions').style.display = 'block';
+          const result = await response.json();
+          if (result.success) {
+              document.getElementById('photo-container').innerHTML = `
+                  <img src="${result.image_url}" id="capturedPhoto" alt="Captured Photo" style="max-width: 100%; border: 1px solid #ccc;" />
+                  <br>
+                  
+              `;
+          } else {
+              document.getElementById('result-message').textContent = result.error;
+          }
       } else {
-        const error = await response.json();
-        document.getElementById('result-message').textContent = `Error: ${error.error}`;
+          document.getElementById('result-message').textContent = "Error capturing image.";
       }
     });
-
-
-    const pc = new RTCPeerConnection({
-      iceServers: [
-      { urls: "stun:stun.l.google.com:19302" },
-      { urls: "turn:18.140.53.117:3478?transport=udp", username: "elevview", credential: "elevview01" }
-    ]
-
+      updateWatermarkUI();
     });
 
- 
-  // รับ Video Track และแสดงใน <video>
-  pc.ontrack = (event) => {
-      console.log("Received track:", event.streams);
-      document.getElementById('video').srcObject = event.streams[0];
-  };
+   // ปิด Popup เมื่อกดพื้นที่นอก Popup Content
+   document.getElementById('popup-overlay').addEventListener('click', function (event) {
+        if (event.target === this) {
+            this.style.display = 'none';
+        }
+    });
 
-  // ตั้งค่าให้ส่ง ICE Candidate ไปที่ Server
-  pc.onicecandidate = (event) => {
-      if (event.candidate) {
-          ws.send(JSON.stringify({ type: "candidate", candidate: event.candidate }));
-      }
-  };
+    document.getElementById('take-photo-button').addEventListener('click', async () => {
+        let button = document.getElementById('take-photo-button');
+        let message = document.getElementById('result-message');
 
-  // เชื่อมต่อ WebSocket
-  const ws = new WebSocket("ws://18.140.53.117:8000/ws/signaling/");
+        // ปิดการใช้งานปุ่ม และเปลี่ยนสีเป็นสีเทา
+        button.disabled = true;
+        button.style.backgroundColor = "#ccc"; // สีเทา
+        button.style.cursor = "not-allowed";
 
-  ws.onmessage = async (event) => {
-      const data = JSON.parse(event.data);
+        // แสดงข้อความ "Capturing photo..."
+        message.textContent = "Capturing photo...";
 
-      if (data.type === "answer") {
-          await pc.setRemoteDescription(new RTCSessionDescription(data));
-      } else if (data.type === "candidate") {
-          await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
-      }
-  };
+        // เปิดใช้งานปุ่ม และล้างข้อความหลัง 3 วินาที
+        setTimeout(() => {
+            button.disabled = false;
+            button.style.backgroundColor = ""; // กลับเป็นสีเดิม
+            button.style.cursor = "pointer";
 
-  async function startWebRTC() {
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-      ws.send(JSON.stringify({ type: "offer", sdp: offer.sdp }));
-  }
-
-  startWebRTC();
+            message.textContent = ""; // ล้างข้อความ
+        }, 3000);
+    });
 
   </script>
+
+  <style>
+    .tip-box {
+    display: flex;
+    align-items: flex-start;
+    background-color: #eaffea; /* สีพื้นหลังอ่อน */
+    border: 1px solid #66ff66; /* เส้นขอบสีเขียว */
+    color: #33cc33; /* สีข้อความ */
+    font-size: 11px;
+    padding: 12px 15px;
+    border-radius: 5px; /* ขอบมน */
+    max-width: 80%;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    }
+
+    .tip-box i {
+        font-size: 20px; /* ขนาดไอคอน */
+        margin-right: 10px;
+    }
+    /* Popup Overlay */
+    .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .popup-content {
+    background: #fff;
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: 350px;
+    width: 90%;
+}
+
+    /* Headline */
+    .popup-content h2 {
+        font-size: 18px;
+        font-weight: bold;
+        color: #000;
+        margin-bottom: 8px;
+    }
+
+/* Description */
+.popup-content p {
+    font-size: 14px;
+    color: #444;
+}
+     
+    .lottie {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff00;
+            
+        }
+      /* Lottie Animation */
+.lottie-container {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 15px;
+}
+
+    #watermark-overlay {
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+    max-width: 200%; /* ให้ลายน้ำมีขนาดไม่เกิน 20% ของรูป */
+    opacity: 0.6;
+    display: none;
+    pointer-events: none; /* ป้องกันการคลิกโดน */
+}
+    .watermark-toggle {
+      position: absolute;
+      top: 50%;
+      font-size: 24px;
+      cursor: pointer;
+      color: #333333;
+      padding: 10px;
+      border-radius: 50%;
+      transform: translateY(-50%);
+    }
+    .fa-chevron-left { left: -40px; }
+    .fa-chevron-right { right: -40px; }
+
+    .btn {
+      display: inline-block;
+      padding: 8px 20px;
+      margin-top: 10px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      color: #fff;
+      width: 80%;
+    }
+
+    
+  </style>
 {% endblock %}
 
 

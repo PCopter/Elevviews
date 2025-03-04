@@ -13,6 +13,12 @@ from django.utils.encoding import force_bytes
 from app_users.utils.activation_token_generator import activation_token_generator
 from app_cameras.models import Photo
 from django.shortcuts import get_object_or_404, redirect
+import boto3
+from django.conf import settings
+from urllib.parse import urlparse
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
 
 
 def signup(request: HttpRequest):
@@ -77,63 +83,119 @@ def activate(request : HttpRequest, uidb64: str, token:str):
     return render(request, "app_users/activate.html", context)
 
 
+from app_users.models import DataEngagement,Profile
+
 @login_required
-def dashboard(request: HttpRequest):
-    user_photos = Photo.objects.filter(user=request.user).order_by('-timestamp')  # รูปภาพของผู้ใช้ เรียงตามเวลาล่าสุด
-    return render(request, "app_users/dashboard.html", {'user_photos': user_photos})
+def dashboard(request):
+    user_photos = Photo.objects.filter(user=request.user).order_by('-timestamp')
+    
+    context = {
+        'user_photos': user_photos,
+        'REASON_CHOICES': DataEngagement.REASON_CHOICES,
+        'TRAVEL_WITH_CHOICES': DataEngagement.TRAVEL_WITH_CHOICES,
+        'SATISFACTION_CHOICES': DataEngagement.SATISFACTION_CHOICES,
+        'PLANNING_CHOICES': DataEngagement.PLANNING_CHOICES,
+    }
+
+    return render(request, "app_users/dashboard.html", context)
+
+
+@login_required
+def save_engagement(request):
+    if request.method == "POST":
+        photo = get_object_or_404(Photo, id=request.POST.get("photo_id"))
+        profile = get_object_or_404(Profile, user=request.user)
+
+        location_satisfaction = request.POST.get("location_satisfaction")
+        elevview_satisfaction = request.POST.get("elevview_satisfaction")
+
+        engagement = DataEngagement.objects.create(
+            photo=photo,
+            profile=profile,
+            reasons_for_visit=request.POST.getlist("reasons_for_visit"),
+            travel_with=request.POST.get("travel_with", ""),  # ใส่ค่า default เป็น "" เพื่อป้องกัน KeyError
+            location_satisfaction=int(location_satisfaction) if location_satisfaction.isdigit() else None,
+            elevview_satisfaction=int(elevview_satisfaction) if elevview_satisfaction.isdigit() else None,
+            planning_ahead=request.POST.get("planning_ahead", ""),
+            location_comment=request.POST.get("location_comment", ""),
+            elevview_comment=request.POST.get("elevview_comment", "")
+        )
+
+        
+
+        return JsonResponse({
+            "success": True,
+            "download_url": photo.image
+        })
+
+    return JsonResponse({"success": False}, status=400)
+
 
 @login_required
 def delete_photo(request, photo_id):
     photo = get_object_or_404(Photo, id=photo_id, user=request.user)
-    
+
     if request.method == 'POST':
-        photo.image.delete()  # ลบไฟล์จากระบบ
-        photo.delete()        # ลบข้อมูลจากฐานข้อมูล
-        return redirect('dashboard')  # กลับไปหน้า Dashboard
+        # ถ้าใช้ S3 ต้องลบรูปจาก bucket ก่อน
+        if settings.USE_S3:
+            s3 = boto3.client('s3')
+            bucket_name = settings.AWS_STORAGE_BUCKET_NAME
+            
+            # ดึงชื่อไฟล์จาก URL
+            parsed_url = urlparse(photo.image)
+            file_key = parsed_url.path.lstrip('/')  # เอา path โดยไม่เอา `/`
+            
+            try:
+                s3.delete_object(Bucket=bucket_name, Key=file_key)
+            except Exception as e:
+                print(f"Error deleting from S3: {e}")
+
+        # ลบข้อมูลออกจากฐานข้อมูล
+        photo.delete()
+        
+        return redirect('dashboard')  
 
     return redirect('dashboard')
 
 
+# ✅ View สำหรับ login เสร็จแล้ว redirect ตามเงื่อนไข
 @login_required
-def profile(request : HttpRequest):
+def login_redirect(request: HttpRequest):
     user = request.user
-    # POST
+    # ถ้ามี profile แล้วไป home ถ้าไม่มีไป profile
+    if hasattr(user, 'profile'):
+        return redirect('home')
+    else:
+        return redirect('profile')
+
+
+# ✅ View สำหรับหน้า profile
+@login_required
+def profile(request: HttpRequest):
+    user = request.user
+    is_new_profile = not hasattr(user, 'profile')  # True ถ้ายังไม่มี profile
+
     if request.method == "POST":
         form = UserProfileForm(request.POST, instance=user)
-        is_new_profile = False
 
-        try:
-            # Create
-            extended_form = ExtendedProfileForm(request.POST, instance=user.profile)
-        except:
-            # Update
-            extended_form = ExtendedProfileForm(request.POST)
-            is_new_profile = True
-
-
+        # ถ้ามี profile ใช้ instance เดิม ถ้าไม่มีสร้างใหม่
+        extended_form = ExtendedProfileForm(
+            request.POST, instance=getattr(user, 'profile', None)
+        )
 
         if form.is_valid() and extended_form.is_valid():
             form.save()
-            # Create
-            if is_new_profile:
-                profile = extended_form.save(commit=False)
-                profile.user = user
-                profile.save()
-            # Update
-            else:
-                extended_form.save()
-            return HttpResponseRedirect(reverse("profile"))
-    
+            profile = extended_form.save(commit=False)
+            profile.user = user
+            profile.save()
+            return HttpResponseRedirect(reverse("home"))  # กลับไป home หลังบันทึกสำเร็จ
     else:
         form = UserProfileForm(instance=user)
-        try:
-            extended_form =  ExtendedProfileForm(instance=user.profile)
-        except:
-            extended_form =  ExtendedProfileForm()
-    # GET
-    
+        extended_form = ExtendedProfileForm(instance=getattr(user, 'profile', None))
+
     context = {
-        "form" : form,
-        "extended_form" : extended_form,
+        "form": form,
+        "extended_form": extended_form,
+        "is_new_profile": is_new_profile,  # ส่งไปให้ template
     }
     return render(request, "app_users/profile.html", context)

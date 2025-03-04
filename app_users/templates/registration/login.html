@@ -7,26 +7,68 @@
 {% block content %}
 <section class="content-section content-section-single">
   <div class="content-container content-container-narrow">
-    <h2 class="content-title">Log in</h2>
+    <h1 class="text-center text-logo-elevview">ELEVVIEW</h1>
+    <p class="content-title" style="font-size: 20px; color: #44484F;">Log in to access</p>
+    <p class="content-title" style="margin-top: -25px; font-size: 20px; color: #44484F;">your account</p>
 
-    <form action="{% url 'login' %}" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+    <form action="{% url 'login' %}" method="post" >
+      {% csrf_token %}
 
-        {% if request.GET.next %}
-          <input type="hidden" name="next" value="{{ request.GET.next }}">
-        {% endif %}
+        <div class="form-field">
+          <input type="text" name="username" placeholder="Email or Username">
+        </div>
+  
+        <div class="form-field">
+          <input type="password" name="password" placeholder="Password">
+        </div>
+    
+        
+        <p class="reset-password"><a style="text-decoration: none; color: #333333;"  href="{% url 'password_reset' %}">Forgot password?</a></p>
+        
+      {% if request.GET.next %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+      {% endif %}
 
 
-        <p>
-          <span><button class="button button-primary" type="submit">Log in</button></span>
-          <span><a class="button" href="{% url 'signup' %}">Sign up</a></span>
-          <span><a class="button" href="{% url 'password_reset' %}">Forgot your password?</a></span>
-        </p>
+      <button type="submit" class="button button-login">Log in</button>
+
+      <!-- <div>
+        <a href="{% url 'signup' %}" class="button button-signup">New to Elevview? Create account</a>
+      </div> -->
+
+      {% if form.errors %}
+        <p>Incorrect username or password.</p>
+      {% endif %}
 
     </form>
 
   </div>
 </section>
+
+<style>
+  .reset-password{
+    position: absolute;
+    right: 15%;
+    margin-top: -24px;
+  }
+
+  .text-logo-elevview {
+            font-size: 3em; /* ขนาดใหญ่พอเหมาะ */
+            font-weight: bold; /* ตัวหนาเพื่อความชัดเจน */
+            color: #333333; /* ใช้สีน้ำเงินหรือสีที่เด่นชัด */
+            text-transform: uppercase; /* เปลี่ยนข้อความเป็นตัวพิมพ์ใหญ่ */
+            font-family: 'Poppins', sans-serif; /* ใช้ฟอนต์โมเดิร์น */
+            letter-spacing: 2px; /* เพิ่มระยะห่างระหว่างตัวอักษร */
+            padding: 10px 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* เพิ่มเงา */
+            cursor: pointer; /* แสดงว่าเป็นลิงก์หรืออินเตอร์แอคทีฟ */
+            margin: 0;
+        }
+  
+  /* Form */
+  
+
+</style>
 {% endblock %}
+
 

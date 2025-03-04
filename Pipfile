@@ -7,13 +7,14 @@ name = "pypi"
 django = "*"
 mysql-connector-python = "*"
 pillow = "*"
-boto3 = "*"
 python-dotenv = "*"
 channels = "*"
 daphne = "*"
 aiortc = "*"
 mysqlclient = "*"
 opencv-python = "*"
+django-storages = "*"
+boto3 = "*"
 
 [dev-packages]
 
