@@ -1,6 +1,8 @@
 from django.contrib import admin
 from app_users.models import CustomUser, Profile, DataEngagement  # นำเข้า Profile และ DataEngagement
 from django.contrib.auth.admin import UserAdmin
+from django.contrib import messages
+from django.db.models import Count
 
 admin.site.register(CustomUser, UserAdmin)
 
@@ -11,19 +13,34 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(DataEngagement)
 class DataEngagementAdmin(admin.ModelAdmin):
-    list_display = ('profile', 'photo', 'timestamp', 'count_reasons', 'count_travel_with', 'count_satisfaction')
+    list_display = ('profile', 'photo', 'timestamp')
     search_fields = ('profile__user__username', 'photo__id')
     list_filter = ('timestamp',)
     ordering = ('-timestamp',)
+    actions = ["show_statistics"]
 
-    def count_reasons(self, obj):
-        return len(obj.reasons_for_visit) if obj.reasons_for_visit else 0
-    count_reasons.short_description = "Number of Reasons"
+    def show_statistics(self, request, queryset):
+        total = queryset.count()
+        
+        # นับจำนวนแต่ละตัวเลือก
+        reason_counts = DataEngagement.objects.values('reasons_for_visit').annotate(count=Count('id'))
+        travel_counts = DataEngagement.objects.values('travel_with').annotate(count=Count('id'))
+        satisfaction_counts = DataEngagement.objects.values('location_satisfaction').annotate(count=Count('id'))
 
-    def count_travel_with(self, obj):
-        return obj.get_travel_with_display()  # แสดงตัวเลือกที่เลือก เช่น "With family"
-    count_travel_with.short_description = "Travel With"
+        msg = f"📊 Total Responses: {total}\n\n"
 
-    def count_satisfaction(self, obj):
-        return f"📍{obj.location_satisfaction} | 📷{obj.elevview_satisfaction}"
-    count_satisfaction.short_description = "Satisfaction (Location | Elevview)"
+        msg += "📌 **Reasons for Visit:**\n"
+        for item in reason_counts:
+            msg += f" - {item['reasons_for_visit']}: {item['count']} responses\n"
+
+        msg += "\n🚶 **Travel With:**\n"
+        for item in travel_counts:
+            msg += f" - {item['travel_with']}: {item['count']} responses\n"
+
+        msg += "\n😊 **Satisfaction Ratings:**\n"
+        for item in satisfaction_counts:
+            msg += f" - {item['location_satisfaction']}: {item['count']} responses\n"
+
+        self.message_user(request, msg, level=messages.INFO)
+
+    show_statistics.short_description = "Show Survey Statistics"
