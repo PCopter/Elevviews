@@ -12,6 +12,32 @@ class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'ages', 'nationality')  # เปลี่ยนจาก phone, address เป็น ages, nationality
     search_fields = ('user__username', 'ages', 'nationality')
 
+
+class TravelWithFilter(admin.SimpleListFilter):
+    title = 'Travel With'
+    parameter_name = 'travel_with'
+
+    def lookups(self, request, model_admin):
+        return DataEngagement.TRAVEL_WITH_CHOICES
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(travel_with=self.value())
+        return queryset
+
+class LocationSatisfactionFilter(admin.SimpleListFilter):
+    title = 'Location Satisfaction'
+    parameter_name = 'location_satisfaction'
+
+    def lookups(self, request, model_admin):
+        return DataEngagement.SATISFACTION_CHOICES
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(location_satisfaction=self.value())
+        return queryset
+
+
 @admin.register(DataEngagement)
 class DataEngagementAdmin(admin.ModelAdmin):
     list_display = ('profile', 'photo', 'timestamp', 
@@ -20,7 +46,7 @@ class DataEngagementAdmin(admin.ModelAdmin):
                     'count_planning_ahead')  # เพิ่มฟังก์ชันที่แสดงจำนวน
     
     search_fields = ('profile__user__username', 'photo__id')
-    list_filter = ('timestamp',)
+    list_filter = ('timestamp', TravelWithFilter, LocationSatisfactionFilter)  # เพิ่ม filters
     ordering = ('-timestamp',)
 
     # นับจำนวนแต่ละตัวเลือกใน reasons_for_visit (JSONField)
