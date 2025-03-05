@@ -61,6 +61,12 @@ def signup(request: HttpRequest):
 def signup_thankyou(request : HttpRequest):
     return render(request, "app_users/signup_thankyou.html")
 
+def terms_of_service(request):
+    return render(request, 'app_users/terms_of_service.html')
+
+def privacy_policy(request):
+    return render(request, 'app_users/privacy_policy.html')
+
 
 def activate(request : HttpRequest, uidb64: str, token:str):
     title = "Activate account done"

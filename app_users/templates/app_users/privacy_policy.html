@@ -1,0 +1,68 @@
+{% extends 'app_general/components/base.html' %}
+{% load static %}
+
+{% block site_title %}
+  Privacy Policy |
+{% endblock %}
+
+{% block content %}
+<section class="policy-container">
+    <div class="policy-content">
+        <h1>ELEVVIEW Privacy Policy</h1>
+        <p>Effective Date:14-2-2025</p>
+        <p>Welcome to Elevview. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our web application.</p>
+
+        <h2>Information We Collect</h2>
+        <p>We collect the following types of information:</p>
+        <ul>
+            <li><strong>Personal Information:</strong> Gender, age, nationality, and reason for travel, which you voluntarily provide.</li>
+            <li><strong>Usage Data:</strong> Information about your interaction with our web application, including device type, IP address, and browser type.</li>
+        </ul>
+
+        <h2>How We Use Your Information</h2>
+        <p>We use your information for the following purposes:</p>
+        <ul>
+            <li>To analyze user demographics and travel trends.</li>
+            <li>To improve and personalize our web application.</li>
+            <li>To comply with legal and regulatory requirements.</li>
+        </ul>
+    </div>
+</section>
+
+<style>
+.policy-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.policy-content h1 {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: left;
+}
+
+.policy-content h2 {
+    font-size: 20px;
+    margin-top: 20px;
+}
+
+.policy-content p,
+.policy-content ul {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.policy-content ul {
+    padding-left: 20px;
+}
+
+.policy-content li {
+    margin-bottom: 10px;
+}
+</style>
+
+{% endblock %}

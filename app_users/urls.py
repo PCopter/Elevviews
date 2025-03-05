@@ -11,6 +11,9 @@ urlpatterns = [
     path('delete-photo/<int:photo_id>/', views.delete_photo, name='delete_photo'),
     path('login-redirect/', views.login_redirect, name='login_redirect'),
     path("save-engagement/", view=views.save_engagement, name="save_engagement"),
+    path('terms-of-service/', views.terms_of_service, name='terms_of_service'),
+    path('privacy-policy/', views.privacy_policy, name='privacy_policy'),
 ] 
+
 
 
