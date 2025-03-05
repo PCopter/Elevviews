@@ -144,7 +144,7 @@ def take_photo(request, camera_id):
             response = iot_client.update_thing_shadow(
                 thingName=THING_NAME,
                 payload=json.dumps(shadow_payload)
-            )
+            ) 
 
             if response['ResponseMetadata']['HTTPStatusCode'] == 200:
                 # ดึงรูปจากฐานข้อมูลล่าสุด
