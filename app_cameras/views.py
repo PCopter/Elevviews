@@ -151,8 +151,8 @@ def take_photo(request, camera_id):
                 latest_photo = Photo.objects.filter(user_id=user_id, camera=camera).order_by('-id').first()
                 if latest_photo:
                     return JsonResponse({'success': True, 'image_url': latest_photo.image})
-                else:
-                    return JsonResponse({'error': 'Image not found in database'})
+                # else:
+                #     return JsonResponse({'error': 'Image not found in database'})
 
         except Exception as e:
             return JsonResponse({'error': str(e)})

@@ -13,7 +13,7 @@
     
    
       <div class="input-section">
-        <form action="{% url 'signup' %}" method="post">
+        <form action="{% url 'signup' %}" method="post" onsubmit="return validateForm()">
           {% csrf_token %}
           {{ form.non_field_errors }}
   
@@ -21,24 +21,34 @@
               {{ form.username }}
               {{ form.username.errors }}
           </div>
+          
           <div class="form-field">
               {{ form.email }}
               {{ form.email.errors }}
           </div>
-          <div class="form-field">
-              {{ form.password1 }}
-              {{ form.password1.errors }}
 
-              <p class="password-hint">
-                <i class="fa fa-exclamation-triangle"></i> Use 8 or more characters with a mix of letters, numbers, and symbols
-              </p>
+          
+          <!-- Password 1 -->
+          <div class="form-field">
+            {{ form.password1 }}
+            {{ form.password1.errors }}
           </div>
 
-          
-          
-          <div class="form-field" >
-              {{ form.password2 }}
-              {{ form.password2.errors }}
+          <div>
+            <ul id="password-requirements" class="password-hint" style="margin-top: -12px;">
+              <li id="length" class="invalid">❌ At least 8 characters</li>
+              <li id="number" class="invalid">❌ At least one number</li>
+              <li id="special" class="invalid">❌ At least one special character (!@#$%^&*)</li>
+            </ul>
+          </div>
+
+          <!-- Password 2 -->
+          <div class="form-field">
+            {{ form.password2 }}
+            {{ form.password2.errors }}
+            <p id="password-match-warning" style="color: #AF4834; display: none; font-size: 14px; margin-top: 8px; margin-bottom: -18px;">
+              ⚠️ Passwords do not match.
+            </p>
           </div>
 
           <!-- Checkbox สำหรับ Policy -->
@@ -74,6 +84,61 @@
 </section>
 
 <script>
+    // ตรวจสอบรหัสผ่าน
+    function checkPasswordStrength() {
+    const password = document.querySelector("input[name='password1']").value;
+    const lengthCheck = document.getElementById("length");
+    const numberCheck = document.getElementById("number");
+    const specialCheck = document.getElementById("special");
+
+    // ตรวจสอบความยาว
+    if (password.length >= 8) {
+      lengthCheck.classList.remove("invalid");
+      lengthCheck.classList.add("valid");
+      lengthCheck.innerHTML = "✅ At least 8 characters";
+    } else {
+      lengthCheck.classList.remove("valid");
+      lengthCheck.classList.add("invalid");
+      lengthCheck.innerHTML = "❌ At least 8 characters";
+    }
+
+    // ตรวจสอบว่ามีตัวเลข
+    if (/\d/.test(password)) {
+      numberCheck.classList.remove("invalid");
+      numberCheck.classList.add("valid");
+      numberCheck.innerHTML = "✅ At least one number";
+    } else {
+      numberCheck.classList.remove("valid");
+      numberCheck.classList.add("invalid");
+      numberCheck.innerHTML = "❌ At least one number";
+    }
+
+    // ตรวจสอบอักขระพิเศษ
+    if (/[!@#$%^&*.-_]/.test(password)) {
+      specialCheck.classList.remove("invalid");
+      specialCheck.classList.add("valid");
+      specialCheck.innerHTML = "✅ At least one special character (!@#$%^&*.-_)";
+    } else {
+      specialCheck.classList.remove("valid");
+      specialCheck.classList.add("invalid");
+      specialCheck.innerHTML = "❌ At least one special character (!@#$%^&*.-_)";
+    }
+  }
+
+  // ตรวจสอบว่ารหัสผ่านตรงกันหรือไม่
+  function checkPasswordMatch() {
+    const password1 = document.querySelector("input[name='password1']").value;
+    const password2 = document.querySelector("input[name='password2']").value;
+    const warning = document.getElementById("password-match-warning");
+
+    if (password1 && password2 && password1 !== password2) {
+      warning.style.display = "block";
+    } else {
+      warning.style.display = "none";
+    }
+  }
+
+
   function toggleSubmit() {
     const checkbox = document.getElementById("agree");
     const button = document.getElementById("signup-btn");
@@ -95,20 +160,37 @@
     }
     return true; // ✅ อนุญาตให้ส่งฟอร์ม
   }
+
+    // Event Listeners
+  document.querySelector("input[name='password1']").addEventListener("input", checkPasswordStrength);
+  document.querySelector("input[name='password1']").addEventListener("input", checkPasswordMatch);
+  document.querySelector("input[name='password2']").addEventListener("input", checkPasswordMatch);
+
 </script>
 
 <style>
   /* ข้อความคำแนะนำรหัสผ่าน */
 /* ข้อความคำแนะนำรหัสผ่าน */
 .password-hint {
-    color: #964b00;
-    font-size: 12px;
-    margin-top: 5px;
-    display: flex;
-    align-items: center;
-    margin-bottom: -18px;
-    
+  font-size: 12px;
+  list-style-type: none;
+  padding: 0;
+  text-align: left;
+  width: fit-content; /* ขนาดพอดีกับเนื้อหา */
+  margin: 0 auto; /* จัดให้อยู่กึ่งกลาง */
+  margin-bottom: 8px;
 }
+
+.password-hint li{
+  margin-bottom: 2px;
+}
+  .invalid {
+    color: #AF4834;
+  }
+
+  .valid {
+    color: green;
+  }
 
 .text-logo-elevview {
             font-size: 3em; /* ขนาดใหญ่พอเหมาะ */
