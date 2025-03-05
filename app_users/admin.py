@@ -36,6 +36,45 @@ class LocationSatisfactionFilter(admin.SimpleListFilter):
         if self.value():
             return queryset.filter(location_satisfaction=self.value())
         return queryset
+    
+# Custom Filter for Elevview Satisfaction
+class ElevviewSatisfactionFilter(admin.SimpleListFilter):
+    title = 'Elevview Satisfaction'
+    parameter_name = 'elevview_satisfaction'
+
+    def lookups(self, request, model_admin):
+        return DataEngagement.SATISFACTION_CHOICES
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(elevview_satisfaction=self.value())
+        return queryset
+
+# Custom Filter for Planning Ahead
+class PlanningAheadFilter(admin.SimpleListFilter):
+    title = 'Planning Ahead'
+    parameter_name = 'planning_ahead'
+
+    def lookups(self, request, model_admin):
+        return DataEngagement.PLANNING_CHOICES
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(planning_ahead=self.value())
+        return queryset
+
+# Custom Filter for Reasons for Visit (Multi-Select JSONField)
+class ReasonsForVisitFilter(admin.SimpleListFilter):
+    title = 'Reasons for Visit'
+    parameter_name = 'reasons_for_visit'
+
+    def lookups(self, request, model_admin):
+        return DataEngagement.REASON_CHOICES
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(reasons_for_visit__contains=[self.value()])
+        return queryset
 
 
 @admin.register(DataEngagement)
@@ -46,7 +85,11 @@ class DataEngagementAdmin(admin.ModelAdmin):
                     'count_planning_ahead')  # เพิ่มฟังก์ชันที่แสดงจำนวน
     
     search_fields = ('profile__user__username', 'photo__id')
-    list_filter = ('timestamp', TravelWithFilter, LocationSatisfactionFilter)  # เพิ่ม filters
+    list_filter = (
+        'timestamp', 'travel_with',
+        LocationSatisfactionFilter, ElevviewSatisfactionFilter, 
+        PlanningAheadFilter, ReasonsForVisitFilter
+    )
     ordering = ('-timestamp',)
 
     # นับจำนวนแต่ละตัวเลือกใน reasons_for_visit (JSONField)
@@ -75,3 +118,7 @@ class DataEngagementAdmin(admin.ModelAdmin):
     def count_planning_ahead(self, obj):
         return dict(DataEngagement.PLANNING_CHOICES).get(obj.planning_ahead, "Unknown")
     count_planning_ahead.short_description = "Planning Ahead"
+
+    def count_reasons_for_visit(self, obj):
+        return len(obj.reasons_for_visit)
+    count_reasons_for_visit.short_description = "Reasons Count"
