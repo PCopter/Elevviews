@@ -118,8 +118,7 @@
               'X-CSRFToken': '{{ csrf_token }}',
               'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ action: 'capture_image', 
-          watermark: watermarkValue })
+          body: JSON.stringify({ action: 'capture_image' })
       });
 
       if (response.ok) {
