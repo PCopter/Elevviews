@@ -70,7 +70,7 @@
       let watermarks = ["none", "CPE"];
       let currentWatermarkIndex = 1;
       let watermarkOverlay = document.getElementById("watermark-overlay");
-
+      // อัปเดต UI ลายน้ำ
       function updateWatermarkUI() {
         if (watermarks[currentWatermarkIndex] === "none") {
           watermarkOverlay.style.display = "none";
@@ -79,7 +79,7 @@
           watermarkOverlay.style.display = "block";
         }
       }
-
+      // เพิ่ม event ให้ปุ่มสลับลายน้ำ
       document.querySelectorAll(".watermark-toggle").forEach(btn => {
         btn.addEventListener("click", function () {
           currentWatermarkIndex = (this.classList.contains("fa-chevron-left"))
@@ -111,14 +111,15 @@
         }, 3000);
     
     
-    
+      const watermarkValue = watermarks[currentWatermarkIndex]; // ส่งค่า 'none' หรือ 'CPE'
+
       const response = await fetch(window.location.href, {
           method: 'POST',
           headers: {
               'X-CSRFToken': '{{ csrf_token }}',
               'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ action: 'capture_image' })
+          body: JSON.stringify({ action: 'capture_image' , watermark: watermarkValue })
       });
 
       if (response.ok) {
@@ -136,7 +137,7 @@
           document.getElementById('result-message').textContent = "Error capturing image.";
       }
     });
-      updateWatermarkUI();
+    updateWatermarkUI();
     });
 
    // ปิด Popup เมื่อกดพื้นที่นอก Popup Content
