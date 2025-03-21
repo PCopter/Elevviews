@@ -19,9 +19,19 @@ pipenvinstall
 git clone https://github.com/PCopter/Elevviews.git
 ```
 2. เปิดโฟลเดอร์โปรเจ็คใน VSCode ไปที่ project/setting แล้วให้ 
-- [ ] commend สำหรับการพัฒนาบน cloud --> AWS EC2
+- [ ] commend สำหรับการพัฒนาบน cloud --> AWS EC2 และ whitenose
 - [x] uncommend สำหรับการพัฒนาบนเครื่องตนเอง 
 ```bash
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware', --> commend
+]
 DATABASES = {
     # สำหรับการพัฒนาบนเครื่องตนเอง
     # 'default': {
